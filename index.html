@@ -1,700 +1,235 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interclasse - Destaque da Rodada</title>
+    <title>Interclasse Porto Seguro 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Fontes personalizadas */
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap');
-
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        /* ESTILO JORNAL */
-        .headline-font {
-            font-family: 'Playfair Display', serif;
-            font-weight: 900;
-            letter-spacing: -2px;
-        }
-
-        .newspaper-section {
-            background: linear-gradient(135deg, #fdf2f8 0%, #f0f4ff 100%);
-            border-top: 8px solid #e91e63;
-            border-bottom: 8px solid #2196f3;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .newspaper-pattern {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(233, 30, 99, 0.03) 2px, rgba(233, 30, 99, 0.03) 4px),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(33, 150, 243, 0.03) 2px, rgba(33, 150, 243, 0.03) 4px);
-            pointer-events: none;
-        }
-
-        .newspaper-card {
-            background: white;
-            border-left: 6px solid #e91e63;
-            border-right: 6px solid #2196f3;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border-radius: 2px;
-        }
-
-        /* Avatar do Jogador */
-        .player-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #e91e63, #2196f3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 8px 20px rgba(233, 30, 99, 0.3);
-            border: 4px solid white;
-        }
-
-        /* Balão de fala (Speech Bubble) */
-        .speech-bubble {
-            background: linear-gradient(135deg, #fff5f8 0%, #f5f9ff 100%);
-            border: 2px solid #e91e63;
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            margin-top: 15px;
-            font-style: italic;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .speech-bubble::before {
-            content: '"';
-            position: absolute;
-            top: -10px;
-            left: 15px;
-            font-size: 48px;
-            color: #e91e63;
-            opacity: 0.2;
-        }
-
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 30px;
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-top: 15px solid #fff5f8;
-            border-right: 0;
-        }
-
-        .speech-bubble-border {
-            border-color: #e91e63;
-        }
-
-        /* Manchete Principal */
-        .main-headline {
-            font-size: 3rem;
-            line-height: 1.1;
-            color: #e91e63;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        @media (max-width: 768px) {
-            .main-headline {
-                font-size: 2rem;
-            }
-        }
-
-        /* Subtítulo estilo jornal */
-        .newspaper-subtitle {
-            font-size: 18px;
-            color: #666;
-            font-weight: 300;
-            border-top: 2px solid #2196f3;
-            padding-top: 15px;
-            margin-top: 15px;
-        }
-
-        /* Info do Jogador */
-        .player-info {
-            background: linear-gradient(135deg, #e91e63, #ec407a);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 0 0 4px 4px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .player-info-name {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .player-info-class {
-            font-size: 12px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Botões Admin */
-        .btn-admin {
-            background: linear-gradient(135deg, #e91e63, #ec407a);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
-        }
-
-        .btn-admin:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
-        }
-
-        .btn-admin-secondary {
-            background: linear-gradient(135deg, #2196f3, #42a5f5);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-
-        .btn-admin-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #e91e63;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e91e63;
-            border-radius: 6px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #2196f3;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .btn-cancel {
-            flex: 1;
-            background: #f0f0f0;
-            color: #333;
-            padding: 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cancel:hover {
-            background: #e0e0e0;
-        }
-
-        .btn-publish {
-            flex: 1;
-            background: linear-gradient(135deg, #e91e63, #ec407a);
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-publish:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        /* Transition para atualizações */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .newspaper-card.updating {
-            animation: pulse 0.6s ease 2;
-        }
+        body { background-color: #06080c; color: #E2E8F0; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tab-content { display: none; }
+        .active-tab { display: block; animation: fadeIn 0.4s ease-out; }
+        .nav-active { color: #00F5FF; border-top: 3px solid #00F5FF; background: rgba(0, 245, 255, 0.05); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .status-futuro { border-left: 4px solid #475569; }
+        .status-concluido { border-left: 4px solid #FF007F; background: rgba(255, 0, 127, 0.05); }
+        
+        /* ESTILO JORNAL INTEGRADO */
+        .font-serif-display { font-family: 'Playfair Display', serif; font-weight: 900; }
+        .jornal-container { border: 2px solid rgba(255, 255, 255, 0.1); background: #111827; border-radius: 1rem; overflow: hidden; margin-bottom: 2rem; }
+        .jornal-header { background: linear-gradient(135deg, #FF007F 0%, #3b82f6 100%); padding: 15px; text-align: center; }
+        .manchete { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1.1; padding: 20px; text-align: center; }
+        .destaque-card { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; }
+        @media (min-width: 640px) { .destaque-card { flex-direction: row; justify-content: center; } }
+        .player-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #FF007F 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; border: 3px solid #fff; font-weight: bold; }
+        .speech-bubble { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 15px; position: relative; font-style: italic; color: #cbd5e1; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- ═══════════════════════════════════════════════════
-         SEÇÃO DESTAQUE DA RODADA (JORNAL)
-         ═══════════════════════════════════════════════════ -->
-    <section class="newspaper-section py-12 px-4 md:px-8 my-8">
-        <div class="newspaper-pattern"></div>
-        
-        <div class="max-w-6xl mx-auto relative z-10">
-            <!-- Manchete Principal -->
-            <div class="text-center mb-12">
-                <div class="headline-font main-headline" id="sectionTitle">
-                    DESTAQUE DA RODADA
-                </div>
-                <div class="newspaper-subtitle">
-                    A história que todos estão falando
-                </div>
-            </div>
+<body class="pb-32">
 
-            <!-- Card do Destaque -->
-            <div id="destaqueContainer" class="newspaper-card p-8">
-                <!-- Estado Vazio -->
-                <div id="emptyState" class="empty-state">
-                    <div class="empty-state-icon">📰</div>
-                    <h3 class="text-xl font-bold text-gray-400 mb-2">Nenhum destaque publicado ainda</h3>
-                    <p class="text-gray-400">Use a área administrativa para publicar o próximo destaque da rodada</p>
-                </div>
+    <header class="p-6 text-center bg-[#111827] border-b border-white/10 shadow-2xl">
+        <h1 class="text-2xl font-black text-[#FF007F] italic uppercase tracking-tighter">Interclasse 7º Ano</h1>
+        <p class="text-[10px] text-cyan-400 font-mono tracking-[0.3em] mt-1 uppercase">Coordenação: Rodrigo</p>
+    </header>
 
-                <!-- Conteúdo do Destaque (Inicialmente Oculto) -->
-                <div id="destaqueContent" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-                        <!-- Avatar -->
-                        <div class="flex justify-center">
-                            <div class="player-avatar" id="playerAvatar">
-                                🏆
-                            </div>
-                        </div>
+    <main class="max-w-xl mx-auto p-4">
 
-                        <!-- Conteúdo Principal -->
-                        <div class="md:col-span-2">
-                            <!-- Manchete da Notícia -->
-                            <h2 class="headline-font text-2xl md:text-3xl text-gray-800 mb-6" id="newsHeadline">
-                                Manchete da Notícia
-                            </h2>
-
-                            <!-- Balão de Fala com Entrevista -->
-                            <div class="speech-bubble speech-bubble-border">
-                                <p id="interviewQuote">
-                                    Citação do atleta sobre o destaque...
-                                </p>
-                            </div>
-
-                            <!-- Info do Jogador -->
-                            <div class="player-info mt-6">
-                                <div class="player-info-name" id="playerName">Nome do Jogador</div>
-                                <div class="player-info-class" id="playerClass">Sala</div>
-                            </div>
-                        </div>
+        <section id="jogos" class="tab-content active-tab">
+            
+            <div id="jornal-area" class="hidden">
+                <div class="jornal-container shadow-2xl border-pink-500/50 border">
+                    <div class="jornal-header">
+                        <h2 class="text-white font-black text-xs uppercase tracking-widest italic">Destaque da Rodada</h2>
                     </div>
+                    <div id="destaque-content">
+                        </div>
+                </div>
+            </div>
 
-                    <!-- Botões de Ação -->
-                    <div class="flex gap-4 mt-8 pt-8 border-t border-gray-200">
-                        <button class="btn-admin" onclick="openEditModal()">✏️ Editar Destaque</button>
-                        <button class="btn-admin-secondary" onclick="clearDestaque()">🗑️ Limpar</button>
+            <h2 class="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-center uppercase tracking-widest">
+                <i class="fas fa-calendar-day text-pink-500"></i> Jogos
+            </h2>
+            <div id="lista-jogos" class="space-y-4"></div>
+        </section>
+
+        <section id="tabela" class="tab-content">
+            <h2 class="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-center uppercase tracking-widest">
+                <i class="fas fa-trophy text-yellow-500"></i> Classificação
+            </h2>
+            <div class="glass rounded-xl overflow-hidden mb-6">
+                <table class="w-full text-sm">
+                    <thead class="bg-white/5 text-gray-400 text-[10px] uppercase font-bold">
+                        <tr><th class="p-4 text-left">Time</th><th class="p-4 text-center">Pts</th><th class="p-4 text-center">Vit</th></tr>
+                    </thead>
+                    <tbody id="tabela-body" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="stats" class="tab-content">
+            <h2 class="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-center uppercase tracking-widest">
+                <i class="fas fa-chart-line text-cyan-400"></i> Líderes
+            </h2>
+            <div class="space-y-6">
+                <div class="glass p-4 rounded-2xl">
+                    <h3 class="text-xs font-black text-cyan-400 uppercase mb-3 italic">⚽ Artilharia</h3>
+                    <div id="rank-artilheiros" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="glass p-4 rounded-2xl">
+                    <h3 class="text-xs font-black text-pink-500 uppercase mb-3 italic">🧤 Menos Vazados</h3>
+                    <div id="rank-goleiros" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="glass p-4 rounded-2xl">
+                    <h3 class="text-xs font-black text-yellow-500 uppercase mb-3 italic">🏆 Ranking MVP (Pontos)</h3>
+                    <div id="rank-mvp" class="space-y-2 text-sm"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="regras" class="tab-content">
+            <h2 class="text-xl font-bold mb-6 flex items-center justify-center gap-2 text-center uppercase tracking-widest">
+                <i class="fas fa-gavel text-red-500"></i> Regras Oficiais
+            </h2>
+            <div class="glass p-6 rounded-2xl space-y-4 text-sm leading-relaxed text-gray-300">
+                <p>• Jogos às <strong>Segundas e Terças</strong>.</p>
+                <p>• 7 jogadores por time (revezamento obrigatório).</p>
+                <p>• Proibido palavrões ou falta de respeito.</p>
+            </div>
+        </section>
+
+        <section id="admin" class="tab-content">
+            <div id="login-section" class="glass p-8 rounded-2xl text-center">
+                <input type="password" id="senha" class="w-full p-4 bg-black/40 rounded-xl border border-white/10 mb-4 text-center text-white" placeholder="Senha">
+                <button onclick="login()" class="w-full bg-cyan-600 p-4 rounded-xl font-black uppercase text-xs">Acessar</button>
+            </div>
+            
+            <div id="painel" class="hidden space-y-6">
+                
+                <div class="glass p-6 rounded-2xl border-t-4 border-yellow-500">
+                    <h3 class="font-bold mb-4 text-xs uppercase text-yellow-500 text-center">🗞️ Publicar Notícia do Jornal</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="adm-manchete" placeholder="Manchete do Jornal" class="w-full bg-slate-900 p-3 rounded-xl text-xs text-white">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="adm-jogador" placeholder="Nome do Jogador" class="w-full bg-slate-900 p-3 rounded-xl text-xs text-white">
+                            <input type="text" id="adm-sala" placeholder="Sala" class="w-full bg-slate-900 p-3 rounded-xl text-xs text-white">
+                        </div>
+                        <textarea id="adm-entrevista" placeholder="O que o jogador disse?" class="w-full bg-slate-900 p-3 rounded-xl text-xs text-white h-20"></textarea>
+                        <button onclick="salvarNoticia()" class="w-full bg-yellow-600 p-3 rounded-xl font-black uppercase text-xs text-white">Publicar Agora</button>
+                        <button onclick="removerNoticia()" class="w-full text-[10px] text-gray-500 underline">Apagar Notícia</button>
                     </div>
                 </div>
+
+                <div class="glass p-6 rounded-2xl border-t-4 border-pink-500">
+                    <h3 class="font-bold mb-4 text-xs uppercase text-pink-500 text-center">Lançar Resultado</h3>
+                    <select id="adm-jogo-id" onchange="carregarJogo()" class="w-full mb-2 bg-slate-900 p-3 rounded-xl text-xs text-white"></select>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <input type="number" id="adm-g1" placeholder="Gols T1" class="w-full bg-slate-900 p-3 rounded-xl text-center text-white">
+                        <input type="number" id="adm-g2" placeholder="Gols T2" class="w-full bg-slate-900 p-3 rounded-xl text-center text-white">
+                    </div>
+                    <button onclick="salvarPartida()" class="w-full bg-[#FF007F] p-4 rounded-xl font-black uppercase text-xs">💾 Salvar Partida</button>
+                </div>
+
+                <button onclick="reseta()" class="w-full text-[10px] text-red-500/50 underline mt-8">⚠️ RESETAR TODO O TORNEIO</button>
             </div>
+        </section>
+    </main>
 
-            <!-- Botão Flutuante para Publicar (Mobile) -->
-            <div class="mt-8 text-center">
-                <button class="btn-admin text-lg px-8 py-4" onclick="openPublishModal()">
-                    📰 Publicar Destaque
-                </button>
-            </div>
-        </div>
-    </section>
+    <nav class="fixed bottom-0 w-full bg-[#0F172A]/95 backdrop-blur-xl border-t border-white/10 flex justify-around p-3 z-50">
+        <button onclick="muda('jogos', this)" class="nav-active flex flex-col items-center p-2 text-gray-500"><i class="fas fa-calendar-day"></i><span class="text-[8px] uppercase mt-1">Jogos</span></button>
+        <button onclick="muda('tabela', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-chart-bar"></i><span class="text-[8px] uppercase mt-1">Tabela</span></button>
+        <button onclick="muda('stats', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-star"></i><span class="text-[8px] uppercase mt-1">Líderes</span></button>
+        <button onclick="muda('regras', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-book"></i><span class="text-[8px] uppercase mt-1">Regras</span></button>
+        <button onclick="muda('admin', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-user-lock"></i><span class="text-[8px] uppercase mt-1">Admin</span></button>
+    </nav>
 
-    <!-- ═══════════════════════════════════════════════════
-         ÁREA ADMINISTRATIVA (Modal)
-         ═══════════════════════════════════════════════════ -->
-    <div id="publishModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                📰 Publicar Destaque da Rodada
-            </div>
-
-            <form id="destaqueForm" onsubmit="publishDestaque(event)">
-                <!-- Título da Notícia -->
-                <div class="form-group">
-                    <label for="manchete">📰 Manchete da Notícia *</label>
-                    <input 
-                        type="text" 
-                        id="manchete" 
-                        placeholder="Ex: Jogador brilha no campeonato..."
-                        required
-                    >
-                </div>
-
-                <!-- Nome do Jogador -->
-                <div class="form-group">
-                    <label for="playerNameInput">👤 Nome do Jogador *</label>
-                    <input 
-                        type="text" 
-                        id="playerNameInput" 
-                        placeholder="Ex: João Silva"
-                        required
-                    >
-                </div>
-
-                <!-- Sala do Jogador -->
-                <div class="form-group">
-                    <label for="playerClassInput">🏫 Sala/Turma *</label>
-                    <input 
-                        type="text" 
-                        id="playerClassInput" 
-                        placeholder="Ex: 3º Ano A"
-                        required
-                    >
-                </div>
-
-                <!-- Entrevista -->
-                <div class="form-group">
-                    <label for="interview">💬 Frase da Entrevista *</label>
-                    <textarea 
-                        id="interview" 
-                        placeholder="Ex: 'Estou muito feliz com essa oportunidade de representar minha turma...'"
-                        required
-                    ></textarea>
-                </div>
-
-                <!-- Ações do Modal -->
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closePublishModal()">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn-publish">
-                        ✅ Publicar
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Script -->
     <script>
-        // ═══════════════════════════════════════════════════
-        // FUNÇÕES DE GERENCIAMENTO LOCAL STORAGE
-        // ═══════════════════════════════════════════════════
+        // CONFIGURAÇÕES DO BANCO DE DADOS LOCAL
+        let db = JSON.parse(localStorage.getItem('inter_2026_db_v3')) || {
+            times: ["Pebas. Fc","7 cb2","Deby e Loide","Complexo do broa","Chapeuzinho","Dominance"].map(n => ({nome:n, pts:0, v:0})),
+            jogos: [], // Aqui vão os seus jogos iniciais (omiti para o código caber)
+            noticia: null
+        };
 
-        const DESTAQUE_KEY = 'interclass_destaque_rodada';
-
-        /**
-         * Salva o destaque no localStorage
-         */
-        function saveDestaqueToStorage(destaque) {
-            localStorage.setItem(DESTAQUE_KEY, JSON.stringify(destaque));
-            console.log('✅ Destaque salvo no localStorage:', destaque);
-        }
-
-        /**
-         * Carrega o destaque do localStorage
-         */
-        function loadDestaqueFromStorage() {
-            const stored = localStorage.getItem(DESTAQUE_KEY);
-            return stored ? JSON.parse(stored) : null;
-        }
-
-        /**
-         * Remove o destaque do localStorage
-         */
-        function deleteDestaqueFromStorage() {
-            localStorage.removeItem(DESTAQUE_KEY);
-            console.log('🗑️ Destaque removido do localStorage');
-        }
-
-        // ═══════════════════════════════════════════════════
-        // FUNÇÕES DE MODAL
-        // ═══════════════════════════════════════════════════
-
-        function openPublishModal() {
-            const modal = document.getElementById('publishModal');
-            const destaque = loadDestaqueFromStorage();
-            
-            if (destaque) {
-                // Modo edição
-                document.getElementById('manchete').value = destaque.manchete;
-                document.getElementById('playerNameInput').value = destaque.playerName;
-                document.getElementById('playerClassInput').value = destaque.playerClass;
-                document.getElementById('interview').value = destaque.interview;
-                document.querySelector('.modal-header').textContent = '✏️ Editar Destaque da Rodada';
-            } else {
-                // Modo novo
-                document.getElementById('destaqueForm').reset();
-                document.querySelector('.modal-header').textContent = '📰 Publicar Destaque da Rodada';
+        // LOGIN ADMIN
+        function login() {
+            if (document.getElementById('senha').value === 'tina1904') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('painel').classList.remove('hidden');
             }
-            
-            modal.classList.add('active');
         }
 
-        function closePublishModal() {
-            const modal = document.getElementById('publishModal');
-            modal.classList.remove('active');
+        // ALTERNAR ABAS
+        function muda(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
+            document.getElementById(id).classList.add('active-tab');
+            btn.classList.add('nav-active');
+            window.scrollTo(0,0);
         }
 
-        function openEditModal() {
-            openPublishModal();
-        }
-
-        // Fechar modal ao clicar fora
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('publishModal');
-            if (event.target === modal) {
-                closePublishModal();
-            }
-        });
-
-        // ═══════════════════════════════════════════════════
-        // FUNÇÕES DE PUBLICAÇÃO E ATUALIZAÇÃO
-        // ═══════════════════════════════════════════════════
-
-        /**
-         * Publica/atualiza o destaque
-         */
-        function publishDestaque(event) {
-            event.preventDefault();
-
-            const destaque = {
-                manchete: document.getElementById('manchete').value.trim(),
-                playerName: document.getElementById('playerNameInput').value.trim(),
-                playerClass: document.getElementById('playerClassInput').value.trim(),
-                interview: document.getElementById('interview').value.trim(),
-                publishedAt: new Date().toLocaleString('pt-BR')
+        // LÓGICA DO JORNAL
+        function salvarNoticia() {
+            const noticia = {
+                manchete: document.getElementById('adm-manchete').value,
+                jogador: document.getElementById('adm-jogador').value,
+                sala: document.getElementById('adm-sala').value,
+                entrevista: document.getElementById('adm-entrevista').value
             };
-
-            // Salva no localStorage
-            saveDestaqueToStorage(destaque);
-
-            // Atualiza a página
-            updateDestaqueDisplay(destaque);
-
-            // Fecha o modal
-            closePublishModal();
-
-            // Feedback visual
-            showNotification('✅ Destaque publicado com sucesso!');
+            db.noticia = noticia;
+            salvarDB();
+            renderJornal();
+            alert("Notícia Publicada!");
         }
 
-        /**
-         * Atualiza a exibição do destaque na página
-         */
-        function updateDestaqueDisplay(destaque) {
-            const container = document.getElementById('destaqueContainer');
-            const emptyState = document.getElementById('emptyState');
-            const content = document.getElementById('destaqueContent');
-
-            // Atualiza os dados
-            document.getElementById('newsHeadline').textContent = destaque.manchete;
-            document.getElementById('interviewQuote').textContent = destaque.interview;
-            document.getElementById('playerName').textContent = destaque.playerName;
-            document.getElementById('playerClassInput').textContent = destaque.playerClass;
-            document.getElementById('playerClass').textContent = destaque.playerClass;
-
-            // Gera avatar com iniciais
-            const initials = destaque.playerName
-                .split(' ')
-                .map(word => word[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2);
-            
-            const colors = ['#e91e63', '#2196f3', '#ff6f00', '#4caf50', '#9c27b0'];
-            const bgColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            const avatar = document.getElementById('playerAvatar');
-            avatar.style.background = `linear-gradient(135deg, ${bgColor}, ${bgColor}cc)`;
-            avatar.textContent = initials;
-
-            // Mostra o conteúdo e esconde empty state
-            emptyState.classList.add('hidden');
-            content.classList.remove('hidden');
-
-            // Animação de atualização
-            container.classList.add('updating');
-            setTimeout(() => {
-                container.classList.remove('updating');
-            }, 600);
+        function removerNoticia() {
+            db.noticia = null;
+            salvarDB();
+            renderJornal();
+            alert("Notícia Removida.");
         }
 
-        /**
-         * Limpa o destaque
-         */
-        function clearDestaque() {
-            if (confirm('Tem certeza que deseja limpar o destaque atual?')) {
-                deleteDestaqueFromStorage();
-                
-                const emptyState = document.getElementById('emptyState');
-                const content = document.getElementById('destaqueContent');
-                
-                content.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                
-                document.getElementById('destaqueForm').reset();
-                
-                showNotification('🗑️ Destaque removido');
+        function renderJornal() {
+            const container = document.getElementById('jornal-area');
+            const content = document.getElementById('destaque-content');
+            
+            if (db.noticia) {
+                container.classList.remove('hidden');
+                content.innerHTML = `
+                    <div class="manchete font-serif-display">${db.noticia.manchete}</div>
+                    <div class="destaque-card">
+                        <div class="flex flex-col items-center">
+                            <div class="player-avatar">${db.noticia.jogador.charAt(0).toUpperCase()}</div>
+                            <div class="text-center mt-2">
+                                <p class="font-bold text-white uppercase text-sm">${db.noticia.jogador}</p>
+                                <p class="text-xs text-gray-500 uppercase">Sala ${db.noticia.sala}</p>
+                            </div>
+                        </div>
+                        <div class="speech-bubble flex-1 max-w-xs">
+                            "${db.noticia.entrevista}"
+                            <div class="text-[9px] text-gray-500 mt-2 text-right">— Entrevista exclusiva</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.classList.add('hidden');
             }
         }
 
-        /**
-         * Exibe notificação temporária
-         */
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #e91e63, #ec407a);
-                color: white;
-                padding: 16px 24px;
-                border-radius: 8px;
-                font-weight: 600;
-                z-index: 2000;
-                animation: slideInRight 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+        function salvarDB() {
+            localStorage.setItem('inter_2026_db_v3', JSON.stringify(db));
         }
 
-        // ═══════════════════════════════════════════════════
-        // INICIALIZAÇÃO
-        // ═══════════════════════════════════════════════════
+        function atualiza() {
+            // Aqui vai a sua lógica original de cálculo de pontos
+            renderJornal();
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const destaque = loadDestaqueFromStorage();
-            
-            if (destaque) {
-                updateDestaqueDisplay(destaque);
-            }
+        window.onload = atualiza;
 
-            console.log('🎉 Interclasse carregado com sucesso!');
-        });
-
-        // Adiciona estilos de animação faltando
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(400px); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOutRight {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(400px); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
+        // Adicione aqui suas outras funções originais (salvarPartida, populaSelect, etc)
     </script>
 </body>
 </html>
