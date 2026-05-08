@@ -14,35 +14,51 @@
         .active-tab { display: block; animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ESTILO JORNAL "TRI" PROFISSIONAL */
+        /* ESTILO JORNAL "TRI" COM BANCADA */
         .jornal-master {
             background: #fffdfa; color: #1a1a1a; padding: 30px; border-radius: 8px;
             box-shadow: 0 30px 60px -12px rgba(0,0,0,0.9); border: 1px solid #d1d5db;
-            margin-bottom: 40px; position: relative;
+            margin-bottom: 40px; position: relative; overflow: hidden;
         }
         .jornal-header-top { border-bottom: 4px solid #1a1a1a; padding-bottom: 8px; margin-bottom: 20px; text-align: center; }
         .jornal-header-top h4 { font-weight: 900; text-transform: uppercase; letter-spacing: 5px; font-size: 12px; }
         
         .manchete-slug {
             font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900;
-            line-height: 1; text-align: center; margin-bottom: 25px; color: #000;
+            line-height: 1; text-align: center; margin-bottom: 30px; color: #000;
             text-transform: uppercase; border-bottom: 1px solid #1a1a1a; padding-bottom: 15px;
         }
 
-        .jornal-content { display: grid; grid-template-columns: 1fr; gap: 25px; }
-        @media (min-width: 768px) { .jornal-content { grid-template-columns: 160px 1fr 200px; } }
+        .jornal-content { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 768px) { .jornal-content { grid-template-columns: 200px 1fr; } }
 
-        /* AVATAR COM FUNDO DE ESTÁDIO */
+        /* AVATAR COM BANCADA DE ENTREVISTA */
+        .estudio-container { position: relative; width: 180px; height: 220px; margin: 0 auto; }
         .avatar-box {
-            width: 160px; height: 160px; border: 5px solid #1a1a1a; position: relative;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500&auto=format&fit=crop');
+            width: 150px; height: 150px; border: 4px solid #1a1a1a; margin: 0 auto;
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=500&auto=format&fit=crop');
             background-size: cover; background-position: center;
-            display: flex; align-items: center; justify-content: center; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
         }
-        .avatar-box span { font-family: 'Playfair Display'; font-size: 5.5rem; color: white; font-weight: 900; text-shadow: 4px 4px 0px #000; }
+        .avatar-box span { font-family: 'Playfair Display'; font-size: 5rem; color: white; font-weight: 900; text-shadow: 3px 3px 0px #000; }
+        
+        .bancada {
+            position: absolute; bottom: 10px; left: 0; width: 180px; height: 70px;
+            background: #1e293b; border: 3px solid #0f172a; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .bancada-logo { font-size: 10px; color: #22d3ee; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        .bancada-tag { background: #ec4899; color: white; font-size: 8px; padding: 2px 8px; border-radius: 10px; margin-top: 4px; font-weight: 800; }
 
         .texto-noticia { font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.6; text-align: justify; color: #222; }
         .texto-noticia::first-letter { font-size: 55px; font-weight: 900; float: left; margin-right: 10px; line-height: 0.8; color: #000; }
+        
+        .entrevista-box { 
+            margin-top: 20px; padding: 15px; background: #f1f5f9; border-left: 5px solid #ec4899; 
+            font-style: italic; color: #334155; font-size: 15px; position: relative;
+        }
+        .entrevista-box::before { content: '"'; font-size: 40px; color: #cbd5e1; position: absolute; left: 5px; top: -10px; }
 
         .nav-btn.active { color: #22d3ee; border-bottom: 3px solid #22d3ee; background: rgba(34, 211, 238, 0.05); }
         .status-win { border-left: 5px solid #ec4899; }
@@ -68,12 +84,12 @@
                 </div>
                 
                 <div class="bg-white/5 p-6 rounded-3xl h-fit border border-white/10">
-                    <h2 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-6 italic">Notícias Anteriores</h2>
+                    <h2 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-6 italic">Arquivo do Jornal</h2>
                     <div id="arquivo-noticias" class="space-y-4"></div>
                 </div>
             </div>
         </section>
-
+        
         <section id="aba-tabela" class="tab-content">
             <h2 class="text-2xl font-black text-center mb-8 italic text-cyan-400 uppercase">Classificação Geral</h2>
             <div class="glass rounded-[2rem] overflow-hidden shadow-2xl">
@@ -127,7 +143,7 @@
 
         <section id="aba-admin" class="tab-content">
             <div id="login-form" class="max-w-sm mx-auto glass p-10 rounded-3xl text-center">
-                <h2 class="font-black uppercase mb-6">Acesso Rodrigo Gomes</h2>
+                <h2 class="font-black uppercase mb-6 text-white">Acesso Rodrigo Gomes</h2>
                 <input type="password" id="pass" class="w-full p-4 bg-black/40 rounded-xl mb-4 text-center text-white border border-white/10" placeholder="Senha">
                 <button onclick="checkPass()" class="w-full bg-cyan-600 p-4 rounded-xl font-black uppercase text-xs">Entrar no Painel</button>
             </div>
@@ -140,11 +156,11 @@
                     <div class="grid grid-cols-2 gap-8 mb-8">
                         <div>
                             <p class="text-[10px] font-black mb-2 uppercase text-center">Gols Time 1</p>
-                            <input type="number" id="g1" class="w-full bg-slate-900 p-6 rounded-2xl text-center text-3xl font-black text-cyan-400">
+                            <input type="number" id="g1" class="w-full bg-slate-900 p-6 rounded-2xl text-center text-3xl font-black text-cyan-400 border border-cyan-500/30">
                         </div>
                         <div>
                             <p class="text-[10px] font-black mb-2 uppercase text-center">Gols Time 2</p>
-                            <input type="number" id="g2" class="w-full bg-slate-900 p-6 rounded-2xl text-center text-3xl font-black text-pink-500">
+                            <input type="number" id="g2" class="w-full bg-slate-900 p-6 rounded-2xl text-center text-3xl font-black text-pink-500 border border-pink-500/30">
                         </div>
                     </div>
 
@@ -164,30 +180,31 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                         <div class="space-y-4">
                             <p class="font-black text-[10px] text-blue-400 uppercase">Goleiros</p>
-                            <input type="text" id="gol-t1" placeholder="Goleiro Time 1" class="w-full bg-slate-900 p-4 rounded-xl text-xs">
-                            <input type="text" id="gol-t2" placeholder="Goleiro Time 2" class="w-full bg-slate-900 p-4 rounded-xl text-xs">
+                            <input type="text" id="gol-t1" placeholder="Goleiro Time 1" class="w-full bg-slate-900 p-4 rounded-xl text-xs text-white">
+                            <input type="text" id="gol-t2" placeholder="Goleiro Time 2" class="w-full bg-slate-900 p-4 rounded-xl text-xs text-white">
                         </div>
                         <div class="space-y-4">
                             <p class="font-black text-[10px] text-yellow-500 uppercase">MVP do Jogo</p>
-                            <input type="text" id="mvp-nome" placeholder="Nome" class="w-full bg-slate-900 p-4 rounded-xl text-xs">
+                            <input type="text" id="mvp-nome" placeholder="Nome" class="w-full bg-slate-900 p-4 rounded-xl text-xs text-white">
                             <div class="flex gap-2">
-                                <input type="text" id="mvp-sala" placeholder="Sala" class="w-1/2 bg-slate-900 p-4 rounded-xl text-xs">
-                                <input type="number" id="mvp-nota" step="0.1" placeholder="Nota" class="w-1/2 bg-slate-900 p-4 rounded-xl text-xs">
+                                <input type="text" id="mvp-sala" placeholder="Sala" class="w-1/2 bg-slate-900 p-4 rounded-xl text-xs text-white">
+                                <input type="number" id="mvp-nota" step="0.1" placeholder="Nota" class="w-1/2 bg-slate-900 p-4 rounded-xl text-xs text-white">
                             </div>
                         </div>
                     </div>
-                    <button onclick="saveMatch()" class="w-full bg-pink-600 p-5 rounded-2xl font-black uppercase mt-10 shadow-xl">Salvar Partida</button>
+                    <button onclick="saveMatch()" class="w-full bg-pink-600 p-5 rounded-2xl font-black uppercase mt-10 shadow-xl shadow-pink-900/40 text-white">Salvar Dados da Partida</button>
                 </div>
 
                 <div class="glass p-8 rounded-3xl border-t-4 border-yellow-500">
-                    <h3 class="font-black text-yellow-500 uppercase mb-6">Novo Jornal</h3>
-                    <input type="text" id="j-manchete" placeholder="Título da Manchete" class="w-full bg-slate-900 p-4 rounded-xl mb-4 font-bold text-white">
+                    <h3 class="font-black text-yellow-500 uppercase mb-6">🎙️ Editor de Manchete e Entrevista</h3>
+                    <input type="text" id="j-manchete" placeholder="Título da Manchete" class="w-full bg-slate-900 p-4 rounded-xl mb-4 font-bold text-white border border-white/10">
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="j-jogador" placeholder="Nome do Craque" class="w-full bg-slate-900 p-4 rounded-xl text-white">
-                        <input type="text" id="j-sala" placeholder="Sala" class="w-full bg-slate-900 p-4 rounded-xl text-white">
+                        <input type="text" id="j-jogador" placeholder="Nome do Craque" class="w-full bg-slate-900 p-4 rounded-xl text-white border border-white/10">
+                        <input type="text" id="j-sala" placeholder="Série/Sala" class="w-full bg-slate-900 p-4 rounded-xl text-white border border-white/10">
                     </div>
-                    <textarea id="j-texto" placeholder="Escreva a notícia aqui..." class="w-full bg-slate-900 p-4 rounded-xl h-32 mb-4 text-white"></textarea>
-                    <button onclick="saveNews()" class="w-full bg-yellow-600 p-4 rounded-xl font-black uppercase">Publicar Manchete</button>
+                    <textarea id="j-texto" placeholder="Notícia principal (O que aconteceu no jogo?)" class="w-full bg-slate-900 p-4 rounded-xl h-24 mb-4 text-white border border-white/10"></textarea>
+                    <textarea id="j-entrevista" placeholder="Entrevista (O que o jogador falou?)" class="w-full bg-slate-900 p-4 rounded-xl h-24 mb-4 text-white border border-pink-500/20 italic" style="border-left-width: 4px;"></textarea>
+                    <button onclick="saveNews()" class="w-full bg-yellow-600 p-4 rounded-xl font-black uppercase text-white shadow-lg">Publicar Jornal Completo</button>
                 </div>
             </div>
         </section>
@@ -214,7 +231,7 @@
             {id:14, t1:"Complexo do broa", t2:"Chapeuzinho", data:"12/05"}
         ];
 
-        let db = JSON.parse(localStorage.getItem('inter_porto_v25')) || {
+        let db = JSON.parse(localStorage.getItem('inter_porto_v28')) || {
             times: ["Pebas. Fc","7 cb2","Deby e Loide","Complexo do broa","Chapeuzinho","Dominance"].map(n => ({nome:n, p:0, v:0, gp:0, gc:0})),
             jogos: CONFIG.map(j => ({...j, g1:null, g2:null, marcadoresT1:[], marcadoresT2:[], goleiroT1:"", goleiroT2:"", mvp:{n:"", s:"", nota:0}})),
             noticias: [{
@@ -222,7 +239,8 @@
                 manchete: "O Interclasse 2026 Começou!",
                 jogador: "Rodrigo",
                 sala: "Coordenação",
-                texto: "Sejam bem-vindos ao portal oficial. Aqui você confere tudo sobre o campeonato do 7º ano. Preparem as chuteiras!",
+                texto: "Sejam bem-vindos ao portal oficial. Aqui você confere tudo sobre o campeonato do 7º ano. Preparem as chuteiras para o maior evento do ano!",
+                entrevista: "Estamos muito felizes em organizar esse evento. Espero que todos joguem com respeito e raça!",
                 data: "01/01/2026"
             }]
         };
@@ -286,7 +304,7 @@
             j.goleiroT2 = document.getElementById('gol-t2').value;
             j.mvp = {n: document.getElementById('mvp-nome').value, s: document.getElementById('mvp-sala').value, nota: parseFloat(document.getElementById('mvp-nota').value)};
             refresh();
-            alert("Salvo!");
+            alert("Placar e estatísticas salvos!");
         }
 
         function saveNews() {
@@ -296,15 +314,16 @@
                 jogador: document.getElementById('j-jogador').value,
                 sala: document.getElementById('j-sala').value,
                 texto: document.getElementById('j-texto').value,
+                entrevista: document.getElementById('j-entrevista').value,
                 data: new Date().toLocaleDateString('pt-BR')
             };
             db.noticias.unshift(news);
             refresh();
-            alert("Publicado!");
+            alert("Notícia publicada com sucesso!");
         }
 
         function refresh() {
-            localStorage.setItem('inter_porto_v25', JSON.stringify(db));
+            localStorage.setItem('inter_porto_v28', JSON.stringify(db));
             db.times.forEach(t => { t.p = 0; t.v = 0; t.gp = 0; t.gc = 0; });
             let art = {}; let mvpR = {}; let glr = {};
 
@@ -335,55 +354,64 @@
 
         function render(art, mvps, glrs) {
             // JORNAL
-            const n = db.noticias[0];
-            document.getElementById('manchete-container').innerHTML = `
-                <div class="jornal-master">
-                    <div class="jornal-header-top"><h4>O DIÁRIO DO PORTO - ${n.data}</h4></div>
-                    <h1 class="manchete-slug">${n.manchete}</h1>
-                    <div class="jornal-content">
-                        <div class="avatar-box mx-auto md:mx-0"><span>${n.jogador.charAt(0)}</span></div>
-                        <div class="texto-noticia">${n.texto}</div>
-                        <div class="border-l border-black/10 pl-4 italic text-sm">
-                            <p class="font-black uppercase text-[10px] mb-2">Entrevistado:</p>
-                            <p class="font-bold">${n.jogador}</p>
-                            <p class="text-xs text-gray-500">Sala ${n.sala}</p>
+            if(db.noticias.length > 0) {
+                const n = db.noticias[0];
+                document.getElementById('manchete-container').innerHTML = `
+                    <div class="jornal-master">
+                        <div class="jornal-header-top"><h4>O DIÁRIO DO PORTO - ${n.data}</h4></div>
+                        <h1 class="manchete-slug">${n.manchete}</h1>
+                        <div class="jornal-content">
+                            <div class="estudio-container">
+                                <div class="avatar-box"><span>${n.jogador.charAt(0)}</span></div>
+                                <div class="bancada">
+                                    <div class="bancada-logo">INTERCLASSE</div>
+                                    <div class="bancada-tag">AO VIVO</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="texto-noticia">${n.texto}</div>
+                                ${n.entrevista ? `
+                                <div class="entrevista-box">
+                                    <p>${n.entrevista}</p>
+                                    <p class="text-[10px] font-black uppercase mt-2 text-pink-600">— ${n.jogador}, Sala ${n.sala}</p>
+                                </div>` : ''}
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+            }
             
-            document.getElementById('arquivo-noticias').innerHTML = db.noticias.slice(1, 5).map(an => `
+            document.getElementById('arquivo-noticias').innerHTML = db.noticias.slice(1, 6).map(an => `
                 <div class="flex gap-4 items-center border-b border-white/5 pb-4">
-                    <div class="w-10 h-10 bg-white/10 rounded flex items-center justify-center font-black">${an.jogador.charAt(0)}</div>
+                    <div class="w-10 h-10 bg-white/10 rounded flex items-center justify-center font-black text-cyan-400">${an.jogador.charAt(0)}</div>
                     <div>
-                        <p class="text-[11px] font-black uppercase text-white">${an.manchete}</p>
-                        <p class="text-[9px] text-gray-500">${an.data}</p>
+                        <p class="text-[11px] font-black uppercase text-white leading-tight">${an.manchete}</p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase">${an.data}</p>
                     </div>
                 </div>`).join('');
-
-            // TABELA
+ // TABELA
             document.getElementById('corpo-tabela').innerHTML = [...db.times].sort((a,b) => b.p - a.p || (b.gp-b.gc) - (a.gp-a.gc)).map(t => `
                 <tr class="border-b border-white/5">
-                    <td class="p-6 text-left uppercase text-xs font-black">${t.nome}</td>
+                    <td class="p-6 text-left uppercase text-xs font-black text-white">${t.nome}</td>
                     <td class="p-6 text-cyan-400 text-xl font-black">${t.p}</td>
-                    <td class="p-6 text-gray-400">${t.v}</td>
-                    <td class="p-6 text-gray-500">${t.gp - t.gc}</td>
+                    <td class="p-6 text-gray-400 font-normal">${t.v}</td>
+                    <td class="p-6 text-gray-500 font-normal">${t.gp - t.gc}</td>
                 </tr>`).join('');
 
             // ELITE
-            document.getElementById('rank-gols').innerHTML = Object.entries(art).sort((a,b) => b[1] - a[1]).map(a => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold"><span>${a[0]}</span><span class="text-pink-500">${a[1]} GOLS</span></div>`).join('');
-            document.getElementById('rank-mvp').innerHTML = Object.entries(mvps).sort((a,b) => (b[1].tot/b[1].q) - (a[1].tot/a[1].q)).map(m => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold"><span>${m[0]}</span><span class="text-yellow-500">⭐ ${(m[1].tot/m[1].q).toFixed(1)}</span></div>`).join('');
-            document.getElementById('rank-goleiros').innerHTML = Object.entries(glrs).sort((a,b) => a[1] - b[1]).map(g => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold"><span>${g[0]}</span><span class="text-blue-400">${g[1]} GOL SOFRIDO</span></div>`).join('');
+            document.getElementById('rank-gols').innerHTML = Object.entries(art).sort((a,b) => b[1] - a[1]).map(a => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold border border-white/5 uppercase"><span>${a[0]}</span><span class="text-pink-500">${a[1]} GOLS</span></div>`).join('');
+            document.getElementById('rank-mvp').innerHTML = Object.entries(mvps).sort((a,b) => (b[1].tot/b[1].q) - (a[1].tot/a[1].q)).map(m => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold border border-white/5 uppercase"><span>${m[0]}</span><span class="text-yellow-500">⭐ ${(m[1].tot/m[1].q).toFixed(1)}</span></div>`).join('');
+            document.getElementById('rank-goleiros').innerHTML = Object.entries(glrs).sort((a,b) => a[1] - b[1]).map(g => `<div class="flex justify-between bg-white/5 p-3 rounded-xl text-[10px] font-bold border border-white/5 uppercase"><span>${g[0]}</span><span class="text-blue-400">${g[1]} Gols Sofridos</span></div>`).join('');
 
             // JOGOS
             document.getElementById('lista-jogos').innerHTML = db.jogos.map(j => `
                 <div class="glass p-6 rounded-3xl ${j.g1 !== null ? 'status-win' : 'status-wait'}">
                     <div class="flex justify-between items-center text-center">
-                        <div class="w-1/3 text-[10px] font-black uppercase text-white/70">${j.t1}</div>
+                        <div class="w-1/3 text-[10px] font-black uppercase text-white/70 tracking-tighter">${j.t1}</div>
                         <div class="w-1/3">
                             <p class="text-[8px] text-cyan-500 font-bold mb-1 uppercase">${j.data}</p>
-                            <div class="text-xl font-black italic">${j.g1 !== null ? j.g1 + ' x ' + j.g2 : 'VS'}</div>
+                            <div class="text-xl font-black italic text-white">${j.g1 !== null ? j.g1 + ' x ' + j.g2 : 'VS'}</div>
                         </div>
-                        <div class="w-1/3 text-[10px] font-black uppercase text-white/70">${j.t2}</div>
+                        <div class="w-1/3 text-[10px] font-black uppercase text-white/70 tracking-tighter">${j.t2}</div>
                     </div>
                 </div>`).join('');
         }
@@ -391,4 +419,5 @@
         window.onload = refresh;
     </script>
 </body>
-</html>
+</html>>
+      
