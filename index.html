@@ -19,19 +19,18 @@
         .gol-entry { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
 
         /* ESTILO JORNAL */
-        .font-serif-display { font-family: 'Playfair Display', serif; }
         .jornal-container { border: 2px solid rgba(255, 255, 255, 0.1); background: #111827; border-radius: 1.5rem; overflow: hidden; margin-bottom: 2.5rem; }
         .jornal-header { background: linear-gradient(135deg, #FF007F 0%, #3b82f6 100%); padding: 12px; text-align: center; }
         .manchete { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; color: #fff; text-transform: uppercase; line-height: 1.1; padding: 20px; text-align: center; }
         .destaque-card { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; }
         @media (min-width: 640px) { .destaque-card { flex-direction: row; justify-content: center; } }
-        .player-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #FF007F 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; border: 4px solid #fff; box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); font-weight: bold; }
+        .player-avatar { width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #FF007F 0%, #3b82f6 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px; border: 4px solid #fff; box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); }
         .speech-bubble { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; position: relative; font-style: italic; color: #e2e8f0; }
         .speech-bubble::before { content: ''; position: absolute; width: 15px; height: 15px; background: #111827; border-left: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1); bottom: 20px; left: -8px; transform: rotate(45deg); }
     </style>
 </head>
 <body class="pb-32">
-    <header class="p-6 text-center bg-[#111827] border-b border-white/10 shadow-2xl">
+    <header class="p-6 text-center bg-[#111827] border-b border-white/10">
         <h1 class="text-2xl font-black text-[#FF007F] italic uppercase tracking-tighter">Interclasse 7º Ano</h1>
         <p class="text-[10px] text-cyan-400 font-mono tracking-[0.3em] mt-1 uppercase">Coordenação: Rodrigo Gomes</p>
     </header>
@@ -39,7 +38,7 @@
     <main class="max-w-xl mx-auto p-4">
         <section id="jogos" class="tab-content active-tab">
             <div id="jornal-area" class="hidden"></div>
-            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest"><i class="fas fa-calendar-day text-pink-500 mr-2"></i> Jogos</h2>
+            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest"><i class="fas fa-calendar-day text-pink-500 mr-2"></i> Próximos Jogos</h2>
             <div id="lista-jogos" class="space-y-4"></div>
         </section>
 
@@ -56,15 +55,33 @@
         </section>
 
         <section id="stats" class="tab-content">
-            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest"><i class="fas fa-chart-line text-cyan-400 mr-2"></i> Líderes</h2>
+            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest"><i class="fas fa-star text-cyan-400 mr-2"></i> Melhores do Torneio</h2>
             <div class="space-y-6">
                 <div class="glass p-4 rounded-2xl">
-                    <h3 class="text-[10px] font-black text-cyan-400 uppercase mb-3 italic">⚽ Artilharia</h3>
+                    <h3 class="text-xs font-black text-cyan-400 uppercase mb-3 italic">⚽ Artilharia (Gols)</h3>
                     <div id="rank-artilheiros" class="space-y-2"></div>
                 </div>
                 <div class="glass p-4 rounded-2xl border-l-4 border-yellow-500">
-                    <h3 class="text-[10px] font-black text-yellow-500 uppercase mb-3 italic">🏆 Melhores em Campo (MVP)</h3>
+                    <h3 class="text-xs font-black text-yellow-500 uppercase mb-3 italic">🏆 Ranking MVP (Notas)</h3>
                     <div id="rank-mvp" class="space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="regras" class="tab-content">
+            <h2 class="text-xl font-bold mb-6 text-center uppercase tracking-widest"><i class="fas fa-book text-red-500 mr-2"></i> Regulamento</h2>
+            <div class="space-y-4 text-xs">
+                <div class="glass p-4 rounded-xl border-l-4 border-cyan-400">
+                    <p class="font-bold text-cyan-400 mb-1">ALIMENTAÇÃO</p>
+                    <p>Proibido jogar sem lanchar/almoçar. Mal-estar causa saída imediata.</p>
+                </div>
+                <div class="glass p-4 rounded-xl border-l-4 border-pink-500">
+                    <p class="font-bold text-pink-500 mb-1">FORMAÇÃO</p>
+                    <p>7 jogadores em quadra. Revezamento obrigatório para todos jogarem.</p>
+                </div>
+                <div class="glass p-4 rounded-xl border-l-4 border-yellow-500">
+                    <p class="font-bold text-yellow-500 mb-1">TEMPO</p>
+                    <p>15 a 20 minutos por partida. Sem intervalo, troca de lado direta.</p>
                 </div>
             </div>
         </section>
@@ -72,62 +89,63 @@
         <section id="admin" class="tab-content">
             <div id="login-section" class="glass p-8 rounded-2xl text-center">
                 <input type="password" id="senha" class="w-full p-4 bg-black/40 rounded-xl border border-white/10 mb-4 text-center text-white" placeholder="Senha de Admin">
-                <button onclick="login()" class="w-full bg-cyan-600 p-4 rounded-xl font-black uppercase text-xs">Entrar</button>
+                <button onclick="login()" class="w-full bg-cyan-600 p-4 rounded-xl font-black uppercase text-xs">Acessar Sistema</button>
             </div>
             
-            <div id="painel" class="hidden space-y-6 text-xs">
+            <div id="painel" class="hidden space-y-6 text-[10px]">
                 <div class="glass p-4 rounded-2xl border-t-2 border-yellow-500">
                     <h3 class="font-bold mb-4 uppercase text-center">🗞️ Configurar Jornal</h3>
                     <div class="space-y-2">
                         <input type="text" id="adm-manchete" placeholder="Manchete" class="w-full bg-slate-900 p-2 rounded-lg text-white">
-                        <input type="text" id="adm-jogador" placeholder="Nome Destaque" class="w-full bg-slate-900 p-2 rounded-lg text-white">
+                        <input type="text" id="adm-jogador" placeholder="Atleta Destaque" class="w-full bg-slate-900 p-2 rounded-lg text-white">
                         <input type="text" id="adm-sala" placeholder="Sala" class="w-full bg-slate-900 p-2 rounded-lg text-white">
-                        <textarea id="adm-entrevista" placeholder="Entrevista" class="w-full bg-slate-900 p-2 rounded-lg text-white h-16"></textarea>
+                        <textarea id="adm-entrevista" placeholder="Frase do Atleta" class="w-full bg-slate-900 p-2 rounded-lg text-white h-16"></textarea>
                         <button onclick="salvarNoticia()" class="w-full bg-yellow-600 p-2 rounded-lg font-bold">Publicar</button>
                     </div>
                 </div>
 
                 <div class="glass p-4 rounded-2xl border-t-2 border-pink-500">
-                    <h3 class="font-bold mb-4 uppercase text-center">Lançar Resultado</h3>
+                    <h3 class="font-bold mb-4 uppercase text-center font-black">Lançar Resultado e MVP</h3>
                     <select id="adm-jogo-id" onchange="carregarJogo()" class="w-full mb-4 bg-slate-900 p-2 rounded-lg text-white"></select>
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <input type="number" id="adm-g1" placeholder="Gols T1" class="w-full bg-slate-900 p-3 rounded-xl text-center text-white font-bold">
-                        <input type="number" id="adm-g2" placeholder="Gols T2" class="w-full bg-slate-900 p-3 rounded-xl text-center text-white font-bold">
+                        <input type="number" id="adm-g1" placeholder="Gols T1" class="w-full bg-slate-900 p-2 rounded-lg text-center text-white font-bold text-lg">
+                        <input type="number" id="adm-g2" placeholder="Gols T2" class="w-full bg-slate-900 p-2 rounded-lg text-center text-white font-bold text-lg">
                     </div>
 
-                    <p class="font-bold mb-2 text-cyan-400">Gols Time 1</p>
-                    <div id="gols-t1-container" class="space-y-2 mb-4"></div>
-                    <button onclick="addGol(1)" class="w-full bg-cyan-600/20 p-2 rounded-lg border border-cyan-600/30">+ Adicionar Gol</button>
+                    <p class="font-bold mb-2 text-cyan-400 uppercase">Artilheiros T1</p>
+                    <div id="gols-t1-container" class="space-y-2 mb-2"></div>
+                    <button onclick="addGol(1)" class="w-full bg-cyan-600/20 p-2 rounded-lg mb-4">+ Adicionar Gol</button>
 
-                    <p class="font-bold mb-2 mt-4 text-pink-400">Gols Time 2</p>
-                    <div id="gols-t2-container" class="space-y-2 mb-4"></div>
-                    <button onclick="addGol(2)" class="w-full bg-pink-600/20 p-2 rounded-lg border border-pink-600/30">+ Adicionar Gol</button>
+                    <p class="font-bold mb-2 text-pink-400 uppercase">Artilheiros T2</p>
+                    <div id="gols-t2-container" class="space-y-2 mb-2"></div>
+                    <button onclick="addGol(2)" class="w-full bg-pink-600/20 p-2 rounded-lg mb-4">+ Adicionar Gol</button>
                     
-                    <div class="mt-6 p-3 bg-white/5 rounded-xl border border-white/10">
-                        <p class="font-bold mb-2 text-yellow-500 uppercase">MVP do Jogo</p>
-                        <input type="text" id="adm-mvp-nome" placeholder="Nome do MVP" class="w-full bg-slate-900 p-2 rounded-lg text-white mb-2">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/10 mt-4">
+                        <p class="font-black text-yellow-500 mb-2 uppercase">Eleger MVP da Partida</p>
+                        <input type="text" id="adm-mvp-nome" placeholder="Nome Completo" class="w-full bg-slate-900 p-2 rounded-lg text-white mb-2">
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" id="adm-mvp-sala" placeholder="Sala" class="w-full bg-slate-900 p-2 rounded-lg text-white">
                             <input type="number" id="adm-mvp-nota" step="0.1" placeholder="Nota (0-10)" class="w-full bg-slate-900 p-2 rounded-lg text-white">
                         </div>
                     </div>
 
-                    <button onclick="salvarPartida()" class="w-full bg-[#FF007F] p-4 rounded-xl font-black uppercase mt-6 shadow-lg">Salvar Partida</button>
+                    <button onclick="salvarPartida()" class="w-full bg-[#FF007F] p-4 rounded-xl font-black uppercase mt-6 text-xs">Salvar Tudo</button>
                 </div>
             </div>
         </section>
     </main>
-        <nav class="fixed bottom-0 w-full bg-[#0F172A]/95 backdrop-blur-xl border-t border-white/10 flex justify-around p-3 z-50">
+
+    <nav class="fixed bottom-0 w-full bg-[#0F172A]/95 backdrop-blur-xl border-t border-white/10 flex justify-around p-3 z-50">
         <button onclick="muda('jogos', this)" class="nav-active flex flex-col items-center p-2 text-gray-500"><i class="fas fa-calendar-day"></i><span class="text-[8px] mt-1">JOGOS</span></button>
         <button onclick="muda('tabela', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-chart-bar"></i><span class="text-[8px] mt-1">TABELA</span></button>
         <button onclick="muda('stats', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-star"></i><span class="text-[8px] mt-1">LÍDERES</span></button>
+        <button onclick="muda('regras', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-book"></i><span class="text-[8px] mt-1">REGRAS</span></button>
         <button onclick="muda('admin', this)" class="flex flex-col items-center p-2 text-gray-500"><i class="fas fa-user-lock"></i><span class="text-[8px] mt-1">ADMIN</span></button>
     </nav>
-
-    <script>
-        const SALAS = ["71","72","73","74","75","76","7cb1","7cb2","7cb3","7cb4","7cb5","7cb6"];
+        <script>
+        const SALAS_OPCOES = ["71","72","73","74","75","76","7cb1","7cb2","7cb3","7cb4","7cb5","7cb6"];
         
-        const JOGOS_FIXOS = [
+        const JOGOS_LISTA = [
             {id:0, t1:"Pebas. Fc", t2:"Deby e Loide", data:"24/03"},
             {id:1, t1:"7 cb2", t2:"Complexo do broa", data:"30/03"},
             {id:2, t1:"Chapeuzinho", t2:"Dominance", data:"31/03"},
@@ -145,9 +163,9 @@
             {id:14, t1:"Complexo do broa", t2:"Chapeuzinho", data:"12/05"}
         ];
 
-        let db = JSON.parse(localStorage.getItem('inter_master_v3')) || {
+        let db = JSON.parse(localStorage.getItem('inter_master_final_2026')) || {
             times: ["Pebas. Fc","7 cb2","Deby e Loide","Complexo do broa","Chapeuzinho","Dominance"].map(n => ({nome:n, pts:0, v:0, gp:0, gc:0})),
-            jogos: JOGOS_FIXOS.map(j => ({...j, g1:null, g2:null, golsT1:[], golsT2:[], mvp:{nome:"", sala:"", nota:0}})),
+            jogos: JOGOS_LISTA.map(j => ({...j, g1:null, g2:null, golsT1:[], golsT2:[], mvp:{nome:"", sala:"", nota:0}})),
             noticia: null
         };
 
@@ -170,11 +188,11 @@
         function addGol(time, nome="", sala="") {
             const div = document.createElement('div');
             div.className = 'gol-entry';
-            const selectSalas = SALAS.map(s => `<option value="${s}" ${s == sala ? 'selected' : ''}>${s}</option>`).join('');
+            const sOpt = SALAS_OPCOES.map(s => `<option value="${s}" ${s == sala ? 'selected' : ''}>${s}</option>`).join('');
             div.innerHTML = `
-                <input type="text" value="${nome}" placeholder="Nome Artilheiro" class="gol-nome flex-1 bg-slate-800 p-2 rounded-lg text-white">
-                <select class="gol-sala bg-slate-800 p-2 rounded-lg text-white">${selectSalas}</select>
-                <button onclick="this.parentElement.remove()" class="text-red-500 px-2">✕</button>`;
+                <input type="text" value="${nome}" placeholder="Atleta" class="gol-nome flex-1 bg-slate-800 p-2 rounded-lg text-white">
+                <select class="gol-sala bg-slate-800 p-2 rounded-lg text-white">${sOpt}</select>
+                <button onclick="this.parentElement.remove()" class="text-red-500 px-1">✕</button>`;
             document.getElementById(`gols-t${time}-container`).appendChild(div);
         }
 
@@ -210,7 +228,7 @@
                 nota: parseFloat(document.getElementById('adm-mvp-nota').value) || 0
             };
             atualiza();
-            alert("Partida Salva!");
+            alert("Sistema Atualizado!");
         }
 
         function salvarNoticia() {
@@ -221,16 +239,13 @@
                 entrevista: document.getElementById('adm-entrevista').value
             };
             atualiza();
-            alert("Notícia Publicada!");
+            alert("Jornal Publicado!");
         }
 
         function atualiza() {
-            localStorage.setItem('inter_master_v3', JSON.stringify(db));
-            
-            // Zerar dados para recalcular
+            localStorage.setItem('inter_master_final_2026', JSON.stringify(db));
             db.times.forEach(t => { t.pts = 0; t.v = 0; t.gp = 0; t.gc = 0; });
-            let artilharia = {};
-            let rankingMVP = {};
+            let art = {}; let mvpR = {};
 
             db.jogos.forEach(j => {
                 if(j.g1 === null) return;
@@ -244,25 +259,25 @@
 
                 [...j.golsT1, ...j.golsT2].forEach(g => {
                     if(!g.nome) return;
-                    const key = `${g.nome} (${g.sala})`;
-                    artilharia[key] = (artilharia[key] || 0) + 1;
+                    const k = `${g.nome} (${g.sala})`;
+                    art[k] = (art[k] || 0) + 1;
                 });
 
                 if(j.mvp.nome) {
-                    const key = `${j.mvp.nome} (${j.mvp.sala})`;
-                    if(!rankingMVP[key]) rankingMVP[key] = {nota: 0, count: 0};
-                    rankingMVP[key].nota += j.mvp.nota;
-                    rankingMVP[key].count += 1;
+                    const k = `${j.mvp.nome} (${j.mvp.sala})`;
+                    if(!mvpR[k]) mvpR[k] = {nota: 0, qtd: 0};
+                    mvpR[k].nota += j.mvp.nota;
+                    mvpR[k].qtd += 1;
                 }
             });
 
-            // Render Jornal
-            const areaJornal = document.getElementById('jornal-area');
+            // Jornal
+            const jArea = document.getElementById('jornal-area');
             if(db.noticia) {
-                areaJornal.classList.remove('hidden');
-                areaJornal.innerHTML = `
-                <div class="jornal-container">
-                    <div class="jornal-header"><span class="text-white text-[9px] font-black uppercase italic">Destaque Interclasse</span></div>
+                jArea.classList.remove('hidden');
+                jArea.innerHTML = `
+                <div class="jornal-container shadow-2xl">
+                    <div class="jornal-header text-white font-black text-[9px] uppercase">Destaque do Porto Seguro</div>
                     <div class="manchete">${db.noticia.manchete}</div>
                     <div class="destaque-card">
                         <div class="flex flex-col items-center">
@@ -275,30 +290,30 @@
                 </div>`;
             }
 
-            // Render Tabela
+            // Tabela
             document.getElementById('tabela-body').innerHTML = [...db.times].sort((a,b) => b.pts - a.pts || (b.gp-b.gc) - (a.gp-a.gc)).map(t => `
                 <tr class="font-bold"><td class="p-4 text-white uppercase">${t.nome}</td>
                 <td class="p-4 text-center text-cyan-400 text-lg">${t.pts}</td>
                 <td class="p-4 text-center">${t.v}</td>
                 <td class="p-4 text-center text-gray-500">${t.gp - t.gc}</td></tr>`).join('');
 
-            // Render Artilharia
-            document.getElementById('rank-artilheiros').innerHTML = Object.entries(artilharia).sort((a,b) => b[1] - a[1]).map(a => `
+            // Artilharia
+            document.getElementById('rank-artilheiros').innerHTML = Object.entries(art).sort((a,b) => b[1] - a[1]).map(a => `
                 <div class="flex justify-between border-b border-white/5 py-2 uppercase font-bold text-[10px]">
-                <span>${a[0]}</span><span class="text-cyan-400">${a[1]} Gols</span></div>`).join('');
+                <span>${a[0]}</span><span class="text-cyan-400 font-black">${a[1]} Gols</span></div>`).join('');
 
-            // Render MVP
-            document.getElementById('rank-mvp').innerHTML = Object.entries(rankingMVP).sort((a,b) => (b[1].nota/b[1].count) - (a[1].nota/a[1].count)).map(m => `
+            // MVP
+            document.getElementById('rank-mvp').innerHTML = Object.entries(mvpR).sort((a,b) => (b[1].nota/b[1].qtd) - (a[1].nota/a[1].qtd)).map(m => `
                 <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg mb-2">
                 <span class="font-bold uppercase text-[10px]">${m[0]}</span>
-                <span class="bg-yellow-500 text-black px-2 py-1 rounded font-black text-[10px]">★ ${(m[1].nota/m[1].count).toFixed(1)}</span></div>`).join('');
+                <span class="bg-yellow-500 text-black px-2 py-1 rounded font-black text-[10px]">★ ${(m[1].nota/m[1].qtd).toFixed(1)}</span></div>`).join('');
 
-            // Render Jogos
+            // Jogos
             document.getElementById('lista-jogos').innerHTML = db.jogos.map(j => `
                 <div class="glass p-4 rounded-2xl ${j.g1 !== null ? 'status-concluido' : 'status-futuro'}">
                     <div class="flex justify-between items-center text-center font-black uppercase text-[10px]">
                         <div class="w-1/3">${j.t1}</div>
-                        <div class="w-1/3 text-lg">${j.g1 !== null ? j.g1+' x '+j.g2 : '<span class="text-[8px] text-gray-500">'+j.data+'</span>'}</div>
+                        <div class="w-1/3 text-lg">${j.g1 !== null ? j.g1+' x '+j.g2 : j.data}</div>
                         <div class="w-1/3">${j.t2}</div>
                     </div>
                 </div>`).join('');
@@ -307,3 +322,4 @@
     </script>
 </body>
 </html>
+
