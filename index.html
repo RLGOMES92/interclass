@@ -26,9 +26,44 @@
         .jogo-card.pendente { border-left:4px solid #475569; }
         input, select, textarea { color: white !important; }
         input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4) !important; }
+
+        /* MODAL NOTÍCIA */
+        #modal-noticia {
+            display:none; position:fixed; inset:0; z-index:200;
+            background:rgba(2,6,23,0.92); backdrop-filter:blur(8px);
+            align-items:center; justify-content:center; padding:16px;
+        }
+        #modal-noticia.open { display:flex; animation:fadeIn 0.25s ease-out; }
+        #modal-inner {
+            background:#fffdfa; color:#1a1a1a; border-radius:12px;
+            max-width:520px; width:100%; max-height:88vh; overflow-y:auto;
+            padding:28px 24px; position:relative;
+            box-shadow:0 40px 80px -12px rgba(0,0,0,0.95);
+        }
+        #modal-inner .manchete-slug { font-size:1.6rem; }
+        #modal-close {
+            position:sticky; top:0; float:right; margin-left:8px;
+            background:#1a1a1a; color:#fff; border:none; border-radius:50%;
+            width:32px; height:32px; font-size:16px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:900; flex-shrink:0;
+        }
+        .noticia-card {
+            cursor:pointer; transition:transform 0.15s, border-color 0.15s;
+        }
+        .noticia-card:hover { transform:translateY(-2px); border-color:rgba(236,72,153,0.4) !important; }
+        .noticia-card:active { transform:scale(0.98); }
     </style>
 </head>
 <body class="pb-32">
+
+<!-- MODAL NOTÍCIA -->
+<div id="modal-noticia" onclick="closeModal(event)">
+    <div id="modal-inner">
+        <button id="modal-close" onclick="fecharModal()">✕</button>
+        <div id="modal-body"></div>
+    </div>
+</div>
 
 <header class="p-8 text-center border-b border-white/5 bg-[#020617]">
     <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">PORTAL <span class="text-pink-500">INTERCLASSE</span></h1>
@@ -423,14 +458,24 @@ function renderNoticias() {
         </div>`;
     }
 
-    // Arquivo
+    // Arquivo — todos clicáveis (exceto a manchete principal que já está aberta)
     const arquivo = document.getElementById('arquivo-noticias');
-    arquivo.innerHTML = noticias.slice(1).map(n => `
-        <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+    // Mostrar todas as notícias antigas (a partir da segunda mais recente)
+    const antigas = noticias.slice(1);
+    arquivo.innerHTML = antigas.map(n => `
+        <div class="noticia-card bg-white/5 rounded-xl p-3 border border-white/10" onclick="abrirNoticia(${n.id})">
             <p class="text-[10px] font-black text-pink-400 uppercase leading-tight">${n.manchete}</p>
             <p class="text-[10px] text-gray-400 mt-1">${n.jogador} · ${n.data}</p>
+            <p class="text-[9px] text-cyan-500 font-bold mt-1">Toque para ler ›</p>
         </div>
     `).join('') || '<p class="text-xs text-gray-500 text-center">Sem notícias antigas</p>';
+
+    // Manchete principal também clicável
+    const mancheteEl = document.querySelector('#manchete-container .jornal-master');
+    if (mancheteEl && noticias[0]) {
+        mancheteEl.style.cursor = 'pointer';
+        mancheteEl.onclick = () => abrirNoticia(noticias[0].id);
+    }
 }
 
 // ─── ADMIN ────────────────────────────────────────────────────────────────
@@ -547,6 +592,38 @@ function showFeedback(id, msg, cls) {
     el.classList.remove('hidden');
     if (!msg.includes('⏳')) setTimeout(() => el.classList.add('hidden'), 4000);
 }
+
+// ─── MODAL NOTÍCIA ────────────────────────────────────────────────────────
+function abrirNoticia(id) {
+    const n = db.noticias.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('modal-body').innerHTML = `
+        <div style="border-bottom:2px solid #1a1a1a; padding-bottom:6px; margin-bottom:14px; text-align:center;">
+            <p style="font-weight:900; text-transform:uppercase; letter-spacing:3px; font-size:10px; color:#888;">Interclasse Porto Seguro 2026</p>
+        </div>
+        <div class="manchete-slug">${n.manchete}</div>
+        <p style="text-align:center; font-size:11px; color:#888; margin-bottom:16px; font-weight:700;">${n.data}${n.jogador ? ' · ' + n.jogador : ''}${n.sala ? ' (' + n.sala + ')' : ''}</p>
+        ${n.texto ? `<div class="texto-noticia">${n.texto}</div>` : ''}
+        ${n.entrevista ? `
+        <div class="entrevista-box" style="margin-top:16px; padding:12px 16px; background:#f1f5f9; border-left:5px solid #ec4899; font-style:italic; color:#334155; font-size:14px;">
+            <strong style="font-style:normal; color:#be185d;">💬 ${n.jogador}${n.sala ? ' (' + n.sala + ')' : ''}:</strong><br>"${n.entrevista}"
+        </div>` : ''}
+    `;
+    document.getElementById('modal-noticia').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModal() {
+    document.getElementById('modal-noticia').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function closeModal(e) {
+    if (e.target === document.getElementById('modal-noticia')) fecharModal();
+}
+
+// Fechar com tecla ESC
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
 
 // ─── START ────────────────────────────────────────────────────────────────
 init();
