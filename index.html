@@ -14,11 +14,71 @@
         .active-tab { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .nav-btn.active { color: #22d3ee; border-bottom: 3px solid #22d3ee; background: rgba(34,211,238,0.05); }
+
+        /* ── Jornal ── */
         .jornal-master { background:#fffdfa; color:#1a1a1a; padding:24px; border-radius:8px; box-shadow:0 30px 60px -12px rgba(0,0,0,0.9); border:1px solid #d1d5db; margin-bottom:32px; }
         .manchete-slug { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; line-height:1.1; text-align:center; margin-bottom:20px; color:#000; text-transform:uppercase; border-bottom:1px solid #1a1a1a; padding-bottom:12px; }
         .texto-noticia { font-family:'Playfair Display',serif; font-size:16px; line-height:1.7; text-align:justify; color:#222; }
         .texto-noticia::first-letter { font-size:52px; font-weight:900; float:left; margin-right:8px; line-height:0.8; color:#000; }
         .entrevista-box { margin-top:16px; padding:12px 16px; background:#f1f5f9; border-left:5px solid #ec4899; font-style:italic; color:#334155; font-size:14px; }
+
+        /* ── Cards de notícia clicáveis ── */
+        .noticia-card {
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border-radius: 12px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.03);
+        }
+        .noticia-card:hover { background: rgba(236,72,153,0.08); border-color: rgba(236,72,153,0.35); transform: translateX(4px); }
+        .noticia-card:active { transform: scale(0.97); }
+        .noticia-card .titulo { font-size:11px; font-weight:900; color:#f1f5f9; line-height:1.3; }
+        .noticia-card .meta { font-size:9px; color:#64748b; margin-top:4px; font-weight:700; }
+        .toque-hint { font-size:9px; color:#ec4899; font-weight:700; display:flex; align-items:center; gap:3px; margin-top:5px; }
+
+        /* ── Modal ── */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(2,6,23,0.92);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            padding: 20px 16px 120px;
+        }
+        #modal-overlay.aberto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+        #modal-conteudo { max-width: 680px; width: 100%; }
+        #btn-fechar-modal {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 400;
+            background: #ec4899;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 24px rgba(236,72,153,0.5);
+            transition: transform 0.15s;
+        }
+        #btn-fechar-modal.aberto { display: flex; }
+        #btn-fechar-modal:hover { transform: scale(1.12) rotate(90deg); }
+
+        /* ── Outros ── */
         .spinner { border:3px solid rgba(255,255,255,0.1); border-top:3px solid #22d3ee; border-radius:50%; width:32px; height:32px; animation:spin 0.8s linear infinite; margin:40px auto; }
         @keyframes spin { to { transform:rotate(360deg); } }
         .jogo-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px; }
@@ -29,6 +89,12 @@
     </style>
 </head>
 <body class="pb-32">
+
+<!-- ── Modal de Notícia ── -->
+<button id="btn-fechar-modal" onclick="fecharModal()">✕</button>
+<div id="modal-overlay" onclick="fecharModalFora(event)">
+    <div id="modal-conteudo"></div>
+</div>
 
 <header class="p-8 text-center border-b border-white/5 bg-[#020617]">
     <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">PORTAL <span class="text-pink-500">INTERCLASSE</span></h1>
@@ -47,8 +113,9 @@
                 <div id="lista-jogos" class="space-y-3"><div class="spinner"></div></div>
             </div>
             <div class="bg-white/5 p-5 rounded-2xl h-fit border border-white/10">
-                <h2 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-4 italic">Notícias</h2>
-                <div id="arquivo-noticias" class="space-y-3"><div class="spinner"></div></div>
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-pink-500 mb-1 italic">📰 Notícias</h2>
+                <p class="text-[8px] text-gray-500 mb-4 font-bold">Toque para ler a matéria completa</p>
+                <div id="arquivo-noticias" class="space-y-2"><div class="spinner"></div></div>
             </div>
         </div>
     </section>
@@ -180,7 +247,7 @@
 </nav>
 
 <script>
-// ─── CONFIGURAÇÃO DOS JOGOS ────────────────────────────────────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────
 const SALAS = ["7cb1","7cb2","7cb3","7cb4","7cb5","7cb6"];
 const CONFIG = [
     {id:0,t1:"Pebas. Fc",t2:"Deby e Loide",data:"24/03"},
@@ -201,31 +268,35 @@ const CONFIG = [
 ];
 
 const DB_KEY = 'interclasse_porto_2026_v1';
+let db = null;
+let isAdmin = false;
 
-// ─── STORAGE PERSISTENTE ──────────────────────────────────────────────────
-// Tenta usar window.storage (Claude Artifacts) se disponível, senão usa localStorage
+// ─── STORAGE COMPARTILHADO ────────────────────────────────────────────────
+// window.storage com shared=true → todos os alunos veem os mesmos dados
+// Fallback para localStorage quando aberto fora do Claude Artifact
 async function storageGet(key) {
     try {
         if (window.storage) {
-            const r = await window.storage.get(key, true); // shared=true → todos veem
+            const r = await window.storage.get(key, true);
             return r ? JSON.parse(r.value) : null;
         }
     } catch(e) {}
-    // fallback localStorage
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; }
 }
 
 async function storageSet(key, value) {
+    let ok = false;
     try {
         if (window.storage) {
-            await window.storage.set(key, JSON.stringify(value), true); // shared=true
-            return;
+            await window.storage.set(key, JSON.stringify(value), true);
+            ok = true;
         }
     } catch(e) {}
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {}
+    try { localStorage.setItem(key, JSON.stringify(value)); ok = true; } catch(e) {}
+    return ok;
 }
 
-// ─── DB INICIAL ───────────────────────────────────────────────────────────
+// ─── DB PADRÃO ────────────────────────────────────────────────────────────
 function getDefaultDB() {
     return {
         times: ["Pebas. Fc","7 cb2","Deby e Loide","Complexo do broa","Chapeuzinho","Dominance"]
@@ -239,18 +310,11 @@ function getDefaultDB() {
     };
 }
 
-let db = null;
-let isAdmin = false;
-
-// ─── INICIALIZAÇÃO ────────────────────────────────────────────────────────
+// ─── INIT ─────────────────────────────────────────────────────────────────
 async function init() {
     document.getElementById('loading-badge').classList.remove('hidden');
     const saved = await storageGet(DB_KEY);
-    if (saved) {
-        db = saved;
-    } else {
-        db = getDefaultDB();
-    }
+    db = saved || getDefaultDB();
     document.getElementById('loading-badge').classList.add('hidden');
     renderAll();
 }
@@ -271,6 +335,49 @@ function nav(id, el) {
     window.scrollTo(0,0);
 }
 
+// ─── MODAL DE NOTÍCIA ─────────────────────────────────────────────────────
+function abrirNoticia(id) {
+    const n = db.noticias.find(x => x.id == id);
+    if (!n) return;
+
+    document.getElementById('modal-conteudo').innerHTML = `
+        <div class="jornal-master">
+            <div style="border-bottom:3px solid #1a1a1a;padding-bottom:6px;margin-bottom:16px;text-align:center;">
+                <p style="font-weight:900;text-transform:uppercase;letter-spacing:4px;font-size:11px;color:#666;">
+                    Interclasse Porto Seguro 2026 &middot; Portal Oficial &middot; ${n.data || ''}
+                </p>
+            </div>
+            <div class="manchete-slug">${n.manchete}</div>
+            ${n.jogador ? `
+            <div style="text-align:center;margin-bottom:14px;">
+                <span style="font-size:11px;font-weight:900;color:#9ca3af;text-transform:uppercase;letter-spacing:0.1em;">
+                    Destaque: <span style="color:#ec4899;">${n.jogador}</span>${n.sala ? ` &middot; ${n.sala}` : ''}
+                </span>
+            </div>` : ''}
+            <div class="texto-noticia">${n.texto || 'Sem texto disponível.'}</div>
+            ${n.entrevista ? `
+            <div class="entrevista-box">
+                <strong style="font-style:normal;">&#128172; ${n.jogador || 'Jogador'} disse:</strong><br>
+                &ldquo;${n.entrevista}&rdquo;
+            </div>` : ''}
+        </div>
+    `;
+
+    document.getElementById('modal-overlay').classList.add('aberto');
+    document.getElementById('btn-fechar-modal').classList.add('aberto');
+    document.body.style.overflow = 'hidden';
+}
+
+function fecharModal() {
+    document.getElementById('modal-overlay').classList.remove('aberto');
+    document.getElementById('btn-fechar-modal').classList.remove('aberto');
+    document.body.style.overflow = '';
+}
+
+function fecharModalFora(e) {
+    if (e.target === document.getElementById('modal-overlay')) fecharModal();
+}
+
 // ─── RENDER JOGOS ─────────────────────────────────────────────────────────
 function renderJogos() {
     const c = document.getElementById('lista-jogos');
@@ -280,7 +387,6 @@ function renderJogos() {
         const div = document.createElement('div');
         div.className = `jogo-card ${enc ? 'encerrado' : 'pendente'}`;
         if (enc) {
-            const winner = j.g1 > j.g2 ? j.t1 : j.g2 > j.g1 ? j.t2 : null;
             div.innerHTML = `
                 <div class="flex items-center justify-between mb-1">
                     <span class="text-[10px] text-gray-400 font-bold">${j.data}</span>
@@ -290,12 +396,12 @@ function renderJogos() {
                     <span class="font-black text-sm ${j.g1 > j.g2 ? 'text-white' : 'text-gray-400'} flex-1">${j.t1}</span>
                     <div class="text-center px-4 py-2 bg-black/30 rounded-xl min-w-[80px]">
                         <span class="text-2xl font-black ${j.g1 > j.g2 ? 'text-cyan-400' : j.g1 < j.g2 ? 'text-pink-500' : 'text-white'}">${j.g1}</span>
-                        <span class="text-gray-500 mx-1">×</span>
+                        <span class="text-gray-500 mx-1">&times;</span>
                         <span class="text-2xl font-black ${j.g2 > j.g1 ? 'text-cyan-400' : j.g2 < j.g1 ? 'text-pink-500' : 'text-white'}">${j.g2}</span>
                     </div>
                     <span class="font-black text-sm ${j.g2 > j.g1 ? 'text-white' : 'text-gray-400'} flex-1 text-right">${j.t2}</span>
                 </div>
-                ${j.mvp.n ? `<div class="mt-2 text-[10px] text-yellow-400 font-bold text-center">⭐ MVP: ${j.mvp.n} (${j.mvp.s})</div>` : ''}
+                ${j.mvp && j.mvp.n ? `<div class="mt-2 text-[10px] text-yellow-400 font-bold text-center">&#11088; MVP: ${j.mvp.n} (${j.mvp.s})</div>` : ''}
             `;
         } else {
             div.innerHTML = `
@@ -306,7 +412,7 @@ function renderJogos() {
                 <div class="flex items-center justify-between gap-2 mt-2">
                     <span class="font-black text-sm text-gray-300 flex-1">${j.t1}</span>
                     <div class="text-center px-4 py-2 bg-black/20 rounded-xl min-w-[80px]">
-                        <span class="text-gray-500 font-black text-lg">× ×</span>
+                        <span class="text-gray-500 font-black text-lg">&times; &times;</span>
                     </div>
                     <span class="font-black text-sm text-gray-300 flex-1 text-right">${j.t2}</span>
                 </div>
@@ -318,10 +424,9 @@ function renderJogos() {
 
 // ─── RENDER TABELA ────────────────────────────────────────────────────────
 function renderTabela() {
-    // recalcular pontuação do zero
     const times = ["Pebas. Fc","7 cb2","Deby e Loide","Complexo do broa","Chapeuzinho","Dominance"]
         .map(n => ({nome:n, p:0, v:0, e:0, d:0, gp:0, gc:0}));
-    
+
     db.jogos.forEach(j => {
         if (j.g1 === null) return;
         const t1 = times.find(t => t.nome === j.t1);
@@ -355,9 +460,9 @@ function renderLideres() {
     const gols = {};
     db.jogos.forEach(j => {
         if (j.g1 === null) return;
-        [...j.marcadoresT1, ...j.marcadoresT2].forEach(m => {
+        [...(j.marcadoresT1||[]), ...(j.marcadoresT2||[])].forEach(m => {
             if (!m.nome) return;
-            const k = `${m.nome}|${m.sala}`;
+            const k = `${m.nome}|${m.sala||''}`;
             gols[k] = (gols[k] || 0) + 1;
         });
     });
@@ -365,16 +470,16 @@ function renderLideres() {
     document.getElementById('rank-gols').innerHTML = rankG.length
         ? rankG.map(([k,v], i) => {
             const [nome, sala] = k.split('|');
-            return `<div class="flex items-center justify-between text-xs"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-pink-500 text-white px-2 py-0.5 rounded-full font-black">${v}</span></div>`;
+            return `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-pink-500 text-white px-2 py-0.5 rounded-full font-black">${v}</span></div>`;
         }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum gol registrado</p>';
 
     // MVP
     const mvps = {};
     db.jogos.forEach(j => {
-        if (!j.mvp.n) return;
-        const k = `${j.mvp.n}|${j.mvp.s}`;
-        if (!mvps[k]) mvps[k] = {total: 0, count: 0};
+        if (!j.mvp || !j.mvp.n) return;
+        const k = `${j.mvp.n}|${j.mvp.s||''}`;
+        if (!mvps[k]) mvps[k] = {total:0, count:0};
         mvps[k].total += parseFloat(j.mvp.nota) || 0;
         mvps[k].count++;
     });
@@ -383,7 +488,7 @@ function renderLideres() {
         ? rankM.map(([k,v], i) => {
             const [nome, sala] = k.split('|');
             const media = v.count > 0 ? (v.total/v.count).toFixed(1) : '0';
-            return `<div class="flex items-center justify-between text-xs"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-yellow-500 text-black px-2 py-0.5 rounded-full font-black">${media}</span></div>`;
+            return `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-yellow-500 text-black px-2 py-0.5 rounded-full font-black">${media}</span></div>`;
         }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum MVP registrado</p>';
 
@@ -396,41 +501,57 @@ function renderLideres() {
     });
     const rankGK = Object.entries(gk).sort((a,b) => a[1].gc - b[1].gc).slice(0,8);
     document.getElementById('rank-goleiros').innerHTML = rankGK.length
-        ? rankGK.map(([nome,v], i) => `<div class="flex items-center justify-between text-xs"><span class="font-black">${i+1}. ${nome}</span><span class="bg-blue-500 text-white px-2 py-0.5 rounded-full font-black">${v.gc} gc</span></div>`).join('')
+        ? rankGK.map(([nome,v], i) => `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome}</span><span class="bg-blue-500 text-white px-2 py-0.5 rounded-full font-black">${v.gc} gc</span></div>`).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum goleiro registrado</p>';
 }
 
 // ─── RENDER NOTÍCIAS ──────────────────────────────────────────────────────
 function renderNoticias() {
-    const noticias = [...db.noticias].reverse();
-    
-    // Manchete principal (notícia mais recente)
-    const mancheteC = document.getElementById('manchete-container');
-    if (noticias.length > 0) {
-        const n = noticias[0];
-        mancheteC.innerHTML = `
-        <div class="jornal-master">
-            <div style="border-bottom:3px solid #1a1a1a; padding-bottom:6px; margin-bottom:16px; text-align:center;">
-                <p style="font-weight:900; text-transform:uppercase; letter-spacing:4px; font-size:11px; color:#666;">Interclasse Porto Seguro 2026 · Portal Oficial</p>
-            </div>
-            <div class="manchete-slug">${n.manchete}</div>
-            <div style="display:grid; grid-template-columns:1fr; gap:20px;">
-                <div>
-                    <div class="texto-noticia">${n.texto}</div>
-                    ${n.entrevista ? `<div class="entrevista-box"><strong style="font-style:normal;">💬 ${n.jogador} (${n.sala}):</strong> "${n.entrevista}"</div>` : ''}
-                </div>
-            </div>
-        </div>`;
+    if (!db.noticias || db.noticias.length === 0) {
+        document.getElementById('manchete-container').innerHTML = '';
+        document.getElementById('arquivo-noticias').innerHTML = '<p class="text-xs text-gray-500 text-center">Sem notícias</p>';
+        return;
     }
 
-    // Arquivo
-    const arquivo = document.getElementById('arquivo-noticias');
-    arquivo.innerHTML = noticias.slice(1).map(n => `
-        <div class="bg-white/5 rounded-xl p-3 border border-white/10">
-            <p class="text-[10px] font-black text-pink-400 uppercase leading-tight">${n.manchete}</p>
-            <p class="text-[10px] text-gray-400 mt-1">${n.jogador} · ${n.data}</p>
+    // Mais recente primeiro
+    const ordenadas = [...db.noticias].reverse();
+    const principal = ordenadas[0];
+    const antigas = ordenadas.slice(1);
+
+    // ── Manchete principal (clicável) ──
+    document.getElementById('manchete-container').innerHTML = `
+        <div class="jornal-master" style="cursor:pointer;" onclick="abrirNoticia(${principal.id})">
+            <div style="border-bottom:3px solid #1a1a1a;padding-bottom:6px;margin-bottom:16px;text-align:center;">
+                <p style="font-weight:900;text-transform:uppercase;letter-spacing:4px;font-size:11px;color:#666;">
+                    Interclasse Porto Seguro 2026 &middot; Portal Oficial
+                </p>
+            </div>
+            <div class="manchete-slug">${principal.manchete}</div>
+            <div class="texto-noticia">${principal.texto || ''}</div>
+            ${principal.entrevista ? `
+            <div class="entrevista-box">
+                <strong style="font-style:normal;">&#128172; ${principal.jogador || 'Jogador'} disse:</strong><br>
+                &ldquo;${principal.entrevista}&rdquo;
+            </div>` : ''}
+            <div style="margin-top:14px;text-align:center;">
+                <span style="font-size:10px;font-weight:900;color:#ec4899;">&#9650; toque para ler completo</span>
+            </div>
         </div>
-    `).join('') || '<p class="text-xs text-gray-500 text-center">Sem notícias antigas</p>';
+    `;
+
+    // ── Notícias antigas — todas clicáveis ──
+    if (antigas.length === 0) {
+        document.getElementById('arquivo-noticias').innerHTML = '<p class="text-[10px] text-gray-500 text-center">Nenhuma notícia anterior</p>';
+        return;
+    }
+
+    document.getElementById('arquivo-noticias').innerHTML = antigas.map(n => `
+        <div class="noticia-card" onclick="abrirNoticia(${n.id})">
+            <p class="titulo">&#128240; ${n.manchete}</p>
+            <p class="meta">${n.data || ''} &middot; ${n.jogador || 'Redação'}${n.sala ? ` &middot; ${n.sala}` : ''}</p>
+            <p class="toque-hint">&#128070; toque para ler</p>
+        </div>
+    `).join('');
 }
 
 // ─── ADMIN ────────────────────────────────────────────────────────────────
@@ -442,7 +563,11 @@ function checkPass() {
         initAdmin();
     } else {
         document.getElementById('pass').style.borderColor = '#ef4444';
-        setTimeout(() => document.getElementById('pass').style.borderColor = '', 1000);
+        document.getElementById('pass').placeholder = 'Senha incorreta!';
+        setTimeout(() => {
+            document.getElementById('pass').style.borderColor = '';
+            document.getElementById('pass').placeholder = 'Senha secreta';
+        }, 1500);
     }
 }
 
@@ -461,10 +586,9 @@ function loadGameData() {
     document.getElementById('g2').value = j.g2 !== null ? j.g2 : '';
     document.getElementById('gol-t1').value = j.goleiroT1 || '';
     document.getElementById('gol-t2').value = j.goleiroT2 || '';
-    document.getElementById('mvp-nome').value = j.mvp.n || '';
-    document.getElementById('mvp-sala').value = j.mvp.s || '';
-    document.getElementById('mvp-nota').value = j.mvp.nota || '';
-    // gols
+    document.getElementById('mvp-nome').value = j.mvp ? j.mvp.n || '' : '';
+    document.getElementById('mvp-sala').value = j.mvp ? j.mvp.s || '' : '';
+    document.getElementById('mvp-nota').value = j.mvp ? j.mvp.nota || '' : '';
     document.getElementById('lista-gols-t1').innerHTML = '';
     document.getElementById('lista-gols-t2').innerHTML = '';
     (j.marcadoresT1 || []).forEach(m => addGoalField(1, m.nome, m.sala));
@@ -490,7 +614,6 @@ async function saveMatch() {
     const g2 = parseInt(document.getElementById('g2').value);
     if (isNaN(g1) || isNaN(g2)) { showFeedback('save-feedback', '⚠️ Insira o placar!', 'text-yellow-400'); return; }
 
-    // Coletar gols
     const getGoals = (time) => [...document.querySelectorAll(`#lista-gols-t${time} .goal-entry`)].map(d => ({
         nome: d.querySelector('input').value.trim(),
         sala: d.querySelector('select').value
@@ -508,19 +631,20 @@ async function saveMatch() {
     };
 
     showFeedback('save-feedback', '⏳ Salvando...', 'text-cyan-400');
-    await storageSet(DB_KEY, db);
-    showFeedback('save-feedback', '✅ Salvo! Todos podem ver agora.', 'text-green-400');
-    
-    // Atualiza select
-    document.querySelector(`#sel-jogo option[value="${id}"]`).textContent = `✅ Jogo ${id+1}: ${j.t1} vs ${j.t2} (${j.data})`;
+    const ok = await storageSet(DB_KEY, db);
+    showFeedback('save-feedback', ok ? '✅ Salvo! Todos podem ver agora.' : '⚠️ Erro ao salvar.', ok ? 'text-green-400' : 'text-red-400');
+
+    const opt = document.querySelector(`#sel-jogo option[value="${id}"]`);
+    if (opt) opt.textContent = `✅ Jogo ${id+1}: ${j.t1} vs ${j.t2} (${j.data})`;
     renderAll();
 }
 
 async function saveNews() {
     const manchete = document.getElementById('j-manchete').value.trim();
     if (!manchete) { showFeedback('news-feedback', '⚠️ Insira um título!', 'text-yellow-400'); return; }
-    
+
     const now = new Date();
+    if (!db.noticias) db.noticias = [];
     db.noticias.push({
         id: Date.now(),
         manchete,
@@ -532,10 +656,9 @@ async function saveNews() {
     });
 
     showFeedback('news-feedback', '⏳ Publicando...', 'text-cyan-400');
-    await storageSet(DB_KEY, db);
-    showFeedback('news-feedback', '✅ Publicado! Todos podem ver.', 'text-green-400');
-    
-    // Limpar campos
+    const ok = await storageSet(DB_KEY, db);
+    showFeedback('news-feedback', ok ? '✅ Publicado! Todos podem ver.' : '⚠️ Erro ao salvar.', ok ? 'text-green-400' : 'text-red-400');
+
     ['j-manchete','j-jogador','j-sala','j-texto','j-entrevista'].forEach(id => document.getElementById(id).value = '');
     renderAll();
 }
