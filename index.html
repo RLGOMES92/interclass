@@ -203,9 +203,25 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="space-y-2">
-                        <p class="font-black text-[10px] text-blue-400 uppercase">Goleiros</p>
-                        <input type="text" id="gol-t1" placeholder="Goleiro T1" class="w-full bg-slate-900 p-3 rounded-xl text-xs border border-white/10">
-                        <input type="text" id="gol-t2" placeholder="Goleiro T2" class="w-full bg-slate-900 p-3 rounded-xl text-xs border border-white/10">
+                        <p class="font-black text-[10px] text-blue-400 uppercase">🧤 Goleiros</p>
+                        <div class="bg-black/20 p-3 rounded-xl space-y-2">
+                            <p class="text-[9px] text-cyan-400 font-black uppercase" id="label-gol-t1">Goleiro T1</p>
+                            <input type="text" id="gol-t1-nome" placeholder="Nome do goleiro" class="w-full bg-slate-900 p-2 rounded-lg text-xs border border-white/10">
+                            <select id="gol-t1-sala" class="w-full bg-slate-900 p-2 rounded-lg text-xs border border-white/10">
+                                <option value="">Sala...</option>
+                                <option>7cb1</option><option>7cb2</option><option>7cb3</option>
+                                <option>7cb4</option><option>7cb5</option><option>7cb6</option>
+                            </select>
+                        </div>
+                        <div class="bg-black/20 p-3 rounded-xl space-y-2">
+                            <p class="text-[9px] text-pink-400 font-black uppercase" id="label-gol-t2">Goleiro T2</p>
+                            <input type="text" id="gol-t2-nome" placeholder="Nome do goleiro" class="w-full bg-slate-900 p-2 rounded-lg text-xs border border-white/10">
+                            <select id="gol-t2-sala" class="w-full bg-slate-900 p-2 rounded-lg text-xs border border-white/10">
+                                <option value="">Sala...</option>
+                                <option>7cb1</option><option>7cb2</option><option>7cb3</option>
+                                <option>7cb4</option><option>7cb5</option><option>7cb6</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="space-y-2">
                         <p class="font-black text-[10px] text-yellow-500 uppercase">MVP</p>
@@ -492,16 +508,52 @@ function renderLideres() {
         }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum MVP registrado</p>';
 
-    // Goleiros
+    // Goleiros — suporta formato novo {nome,sala} e legado (string)
     const gk = {};
     db.jogos.forEach(j => {
         if (j.g1 === null) return;
-        if (j.goleiroT1) { if (!gk[j.goleiroT1]) gk[j.goleiroT1] = {gc:0, jogos:0}; gk[j.goleiroT1].gc += j.g2; gk[j.goleiroT1].jogos++; }
-        if (j.goleiroT2) { if (!gk[j.goleiroT2]) gk[j.goleiroT2] = {gc:0, jogos:0}; gk[j.goleiroT2].gc += j.g1; gk[j.goleiroT2].jogos++; }
+        [
+            { raw: j.goleiroT1, gcSofrido: j.g2 },
+            { raw: j.goleiroT2, gcSofrido: j.g1 }
+        ].forEach(({ raw, gcSofrido }) => {
+            if (!raw) return;
+            const nome = typeof raw === 'object' ? raw.nome : raw;
+            const sala = typeof raw === 'object' ? (raw.sala || '') : '';
+            if (!nome) return;
+            const k = `${nome}||${sala}`;
+            if (!gk[k]) gk[k] = { nome, sala, gc: 0, jogos: 0 };
+            gk[k].gc += gcSofrido;
+            gk[k].jogos++;
+        });
     });
-    const rankGK = Object.entries(gk).sort((a,b) => a[1].gc - b[1].gc).slice(0,8);
+    const rankGK = Object.values(gk)
+        .sort((a, b) => {
+            // Primeiro: menos gols sofridos por jogo; desempate: mais jogos
+            const mediaA = a.jogos > 0 ? a.gc / a.jogos : 99;
+            const mediaB = b.jogos > 0 ? b.gc / b.jogos : 99;
+            if (mediaA !== mediaB) return mediaA - mediaB;
+            return b.jogos - a.jogos;
+        })
+        .slice(0, 8);
+
     document.getElementById('rank-goleiros').innerHTML = rankGK.length
-        ? rankGK.map(([nome,v], i) => `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome}</span><span class="bg-blue-500 text-white px-2 py-0.5 rounded-full font-black">${v.gc} gc</span></div>`).join('')
+        ? rankGK.map((v, i) => {
+            const media = v.jogos > 0 ? (v.gc / v.jogos).toFixed(1) : '0.0';
+            const zerou = v.gc === 0;
+            return `
+            <div class="py-2 border-b border-white/5">
+                <div class="flex items-center justify-between">
+                    <span class="font-black text-xs">${i+1}. ${v.nome}</span>
+                    <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">${v.gc} GC</span>
+                </div>
+                <div class="flex items-center gap-3 mt-1">
+                    ${v.sala ? `<span class="text-[9px] text-gray-500 font-bold">${v.sala}</span>` : ''}
+                    <span class="text-[9px] text-gray-500">${v.jogos} jogo${v.jogos !== 1 ? 's' : ''}</span>
+                    <span class="text-[9px] font-black ${zerou ? 'text-green-400' : 'text-blue-300'}">${media} gc/jogo</span>
+                    ${zerou ? '<span class="text-[9px] text-green-400 font-black">🛡️ zerou!</span>' : ''}
+                </div>
+            </div>`;
+        }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum goleiro registrado</p>';
 }
 
@@ -584,8 +636,18 @@ function loadGameData() {
     document.getElementById('label-t2').textContent = j.t2;
     document.getElementById('g1').value = j.g1 !== null ? j.g1 : '';
     document.getElementById('g2').value = j.g2 !== null ? j.g2 : '';
-    document.getElementById('gol-t1').value = j.goleiroT1 || '';
-    document.getElementById('gol-t2').value = j.goleiroT2 || '';
+    // Goleiros — suporte ao novo formato {nome, sala} e ao legado (string)
+    const gt1 = j.goleiroT1 || {};
+    const gt2 = j.goleiroT2 || {};
+    document.getElementById('gol-t1-nome').value = typeof gt1 === 'object' ? (gt1.nome || '') : gt1;
+    document.getElementById('gol-t1-sala').value = typeof gt1 === 'object' ? (gt1.sala || '') : '';
+    document.getElementById('gol-t2-nome').value = typeof gt2 === 'object' ? (gt2.nome || '') : gt2;
+    document.getElementById('gol-t2-sala').value = typeof gt2 === 'object' ? (gt2.sala || '') : '';
+    // Labels com nome dos times
+    const lblG1 = document.getElementById('label-gol-t1');
+    const lblG2 = document.getElementById('label-gol-t2');
+    if (lblG1) lblG1.textContent = `Goleiro — ${j.t1}`;
+    if (lblG2) lblG2.textContent = `Goleiro — ${j.t2}`;
     document.getElementById('mvp-nome').value = j.mvp ? j.mvp.n || '' : '';
     document.getElementById('mvp-sala').value = j.mvp ? j.mvp.s || '' : '';
     document.getElementById('mvp-nota').value = j.mvp ? j.mvp.nota || '' : '';
@@ -622,8 +684,8 @@ async function saveMatch() {
     j.g1 = g1; j.g2 = g2;
     j.marcadoresT1 = getGoals(1);
     j.marcadoresT2 = getGoals(2);
-    j.goleiroT1 = document.getElementById('gol-t1').value.trim();
-    j.goleiroT2 = document.getElementById('gol-t2').value.trim();
+    j.goleiroT1 = { nome: document.getElementById('gol-t1-nome').value.trim(), sala: document.getElementById('gol-t1-sala').value };
+    j.goleiroT2 = { nome: document.getElementById('gol-t2-nome').value.trim(), sala: document.getElementById('gol-t2-sala').value };
     j.mvp = {
         n: document.getElementById('mvp-nome').value.trim(),
         s: document.getElementById('mvp-sala').value.trim(),
