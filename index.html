@@ -472,43 +472,61 @@ function renderTabela() {
 
 // ─── RENDER LÍDERES ───────────────────────────────────────────────────────
 function renderLideres() {
-    // Artilharia
+    const medal = (i) => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+
+    // ── Artilharia — conta quantidade real de gols por marcador ──
     const gols = {};
     db.jogos.forEach(j => {
         if (j.g1 === null) return;
         [...(j.marcadoresT1||[]), ...(j.marcadoresT2||[])].forEach(m => {
             if (!m.nome) return;
-            const k = `${m.nome}|${m.sala||''}`;
-            gols[k] = (gols[k] || 0) + 1;
+            const k = `${m.nome}||${m.sala||''}`;
+            // m.qtd existe quando o admin registrou quantidade; senão conta 1 por entrada
+            gols[k] = (gols[k] || 0) + (parseInt(m.qtd) || 1);
         });
     });
-    const rankG = Object.entries(gols).sort((a,b) => b[1]-a[1]).slice(0,8);
+    const rankG = Object.entries(gols).sort((a,b) => b[1] - a[1]); // TODOS, sem slice
     document.getElementById('rank-gols').innerHTML = rankG.length
         ? rankG.map(([k,v], i) => {
-            const [nome, sala] = k.split('|');
-            return `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-pink-500 text-white px-2 py-0.5 rounded-full font-black">${v}</span></div>`;
+            const [nome, sala] = k.split('||');
+            return `
+            <div class="flex items-center justify-between py-1.5 border-b border-white/5">
+                <span class="text-xs font-black">${medal(i)} ${nome}${sala ? ` <span class="text-gray-500 font-normal text-[9px]">${sala}</span>` : ''}</span>
+                <span class="bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black shrink-0 ml-2">${v} ⚽</span>
+            </div>`;
         }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum gol registrado</p>';
 
-    // MVP
+    // ── MVP — nota acumulada (soma total), média exibida como info extra ──
     const mvps = {};
     db.jogos.forEach(j => {
         if (!j.mvp || !j.mvp.n) return;
-        const k = `${j.mvp.n}|${j.mvp.s||''}`;
-        if (!mvps[k]) mvps[k] = {total:0, count:0};
-        mvps[k].total += parseFloat(j.mvp.nota) || 0;
+        const k = `${j.mvp.n}||${j.mvp.s||''}`;
+        if (!mvps[k]) mvps[k] = { nome: j.mvp.n, sala: j.mvp.s||'', total: 0, count: 0 };
+        const nota = parseFloat(j.mvp.nota) || 0;
+        mvps[k].total += nota;
         mvps[k].count++;
     });
-    const rankM = Object.entries(mvps).sort((a,b) => b[1].total - a[1].total).slice(0,8);
+    // Ordenado por nota total acumulada (quem ganhou mais vezes com notas maiores fica na frente)
+    const rankM = Object.values(mvps).sort((a,b) => b.total - a.total); // TODOS
     document.getElementById('rank-mvp').innerHTML = rankM.length
-        ? rankM.map(([k,v], i) => {
-            const [nome, sala] = k.split('|');
-            const media = v.count > 0 ? (v.total/v.count).toFixed(1) : '0';
-            return `<div class="flex items-center justify-between text-xs py-1 border-b border-white/5"><span class="font-black">${i+1}. ${nome} <span class="text-gray-400 font-normal">(${sala})</span></span><span class="bg-yellow-500 text-black px-2 py-0.5 rounded-full font-black">${media}</span></div>`;
+        ? rankM.map((v, i) => {
+            const media = v.count > 0 ? (v.total / v.count).toFixed(1) : '0.0';
+            return `
+            <div class="py-1.5 border-b border-white/5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black">${medal(i)} ${v.nome}${v.sala ? ` <span class="text-gray-500 font-normal text-[9px]">${v.sala}</span>` : ''}</span>
+                    <span class="bg-yellow-500 text-black text-[10px] px-2 py-0.5 rounded-full font-black shrink-0 ml-2">${v.total.toFixed(1)} pts</span>
+                </div>
+                <div class="flex gap-3 mt-0.5">
+                    <span class="text-[9px] text-gray-500">${v.count}x MVP</span>
+                    <span class="text-[9px] text-yellow-300 font-bold">média ${media}</span>
+                </div>
+            </div>`;
         }).join('')
         : '<p class="text-xs text-gray-500 text-center">Nenhum MVP registrado</p>';
 
-    // Goleiros — suporta formato novo {nome,sala} e legado (string)
+    // ── Goleiros — suporta formato novo {nome,sala} e legado (string) ──
     const gk = {};
     db.jogos.forEach(j => {
         if (j.g1 === null) return;
@@ -526,15 +544,12 @@ function renderLideres() {
             gk[k].jogos++;
         });
     });
-    const rankGK = Object.values(gk)
-        .sort((a, b) => {
-            // Primeiro: menos gols sofridos por jogo; desempate: mais jogos
-            const mediaA = a.jogos > 0 ? a.gc / a.jogos : 99;
-            const mediaB = b.jogos > 0 ? b.gc / b.jogos : 99;
-            if (mediaA !== mediaB) return mediaA - mediaB;
-            return b.jogos - a.jogos;
-        })
-        .slice(0, 8);
+    const rankGK = Object.values(gk).sort((a, b) => {
+        const mA = a.jogos > 0 ? a.gc / a.jogos : 99;
+        const mB = b.jogos > 0 ? b.gc / b.jogos : 99;
+        if (mA !== mB) return mA - mB;
+        return b.jogos - a.jogos;
+    }); // TODOS
 
     document.getElementById('rank-goleiros').innerHTML = rankGK.length
         ? rankGK.map((v, i) => {
@@ -543,10 +558,10 @@ function renderLideres() {
             return `
             <div class="py-2 border-b border-white/5">
                 <div class="flex items-center justify-between">
-                    <span class="font-black text-xs">${i+1}. ${v.nome}</span>
-                    <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">${v.gc} GC</span>
+                    <span class="text-xs font-black">${medal(i)} ${v.nome}</span>
+                    <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black shrink-0 ml-2">${v.gc} GC</span>
                 </div>
-                <div class="flex items-center gap-3 mt-1">
+                <div class="flex items-center gap-3 mt-0.5">
                     ${v.sala ? `<span class="text-[9px] text-gray-500 font-bold">${v.sala}</span>` : ''}
                     <span class="text-[9px] text-gray-500">${v.jogos} jogo${v.jogos !== 1 ? 's' : ''}</span>
                     <span class="text-[9px] font-black ${zerou ? 'text-green-400' : 'text-blue-300'}">${media} gc/jogo</span>
