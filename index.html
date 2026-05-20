@@ -198,8 +198,8 @@
                     <div><p class="text-[10px] font-black mb-2 uppercase text-center text-pink-500" id="label-t2">T2</p><input type="number" id="g2" min="0" class="w-full bg-slate-900 p-5 rounded-xl text-center text-3xl font-black text-pink-500 border border-pink-500/30"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div class="bg-black/20 p-4 rounded-xl"><p class="font-black text-[10px] mb-3 text-cyan-400 uppercase">Artilharia T1</p><div id="lista-gols-t1"></div><button onclick="addGoalField(1)" class="w-full mt-2 p-2 bg-cyan-900/40 rounded text-[10px] font-bold text-cyan-300">+ Gol</button></div>
-                    <div class="bg-black/20 p-4 rounded-xl"><p class="font-black text-[10px] mb-3 text-pink-500 uppercase">Artilharia T2</p><div id="lista-gols-t2"></div><button onclick="addGoalField(2)" class="w-full mt-2 p-2 bg-pink-900/40 rounded text-[10px] font-bold text-pink-300">+ Gol</button></div>
+                    <div class="bg-black/20 p-4 rounded-xl"><div class="flex justify-between items-center mb-3"><p class="font-black text-[10px] text-cyan-400 uppercase">Artilharia T1</p><span class="text-[8px] text-yellow-400 font-bold">Nome · Sala · Qtd⚽</span></div><div id="lista-gols-t1"></div><button onclick="addGoalField(1)" class="w-full mt-2 p-2 bg-cyan-900/40 rounded text-[10px] font-bold text-cyan-300">+ Gol</button></div>
+                    <div class="bg-black/20 p-4 rounded-xl"><div class="flex justify-between items-center mb-3"><p class="font-black text-[10px] text-pink-500 uppercase">Artilharia T2</p><span class="text-[8px] text-yellow-400 font-bold">Nome · Sala · Qtd⚽</span></div><div id="lista-gols-t2"></div><button onclick="addGoalField(2)" class="w-full mt-2 p-2 bg-pink-900/40 rounded text-[10px] font-bold text-pink-300">+ Gol</button></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="space-y-2">
@@ -482,7 +482,7 @@ function renderLideres() {
             if (!m.nome) return;
             const k = `${m.nome}||${m.sala||''}`;
             // m.qtd existe quando o admin registrou quantidade; senão conta 1 por entrada
-            gols[k] = (gols[k] || 0) + (parseInt(m.qtd) || 1);
+            gols[k] = (gols[k] || 0) + (parseInt(m.qtd) > 0 ? parseInt(m.qtd) : 1);
         });
     });
     const rankG = Object.entries(gols).sort((a,b) => b[1] - a[1]); // TODOS, sem slice
@@ -504,7 +504,7 @@ function renderLideres() {
         const k = `${j.mvp.n}||${j.mvp.s||''}`;
         if (!mvps[k]) mvps[k] = { nome: j.mvp.n, sala: j.mvp.s||'', total: 0, count: 0 };
         const nota = parseFloat(j.mvp.nota) || 0;
-        mvps[k].total += nota;
+        mvps[k].total = Math.round((mvps[k].total + nota) * 100) / 100;
         mvps[k].count++;
     });
     // Ordenado por nota total acumulada (quem ganhou mais vezes com notas maiores fica na frente)
@@ -540,7 +540,7 @@ function renderLideres() {
             if (!nome) return;
             const k = `${nome}||${sala}`;
             if (!gk[k]) gk[k] = { nome, sala, gc: 0, jogos: 0 };
-            gk[k].gc += gcSofrido;
+            gk[k].gc += Number(gcSofrido) || 0;
             gk[k].jogos++;
         });
     });
@@ -668,18 +668,19 @@ function loadGameData() {
     document.getElementById('mvp-nota').value = j.mvp ? j.mvp.nota || '' : '';
     document.getElementById('lista-gols-t1').innerHTML = '';
     document.getElementById('lista-gols-t2').innerHTML = '';
-    (j.marcadoresT1 || []).forEach(m => addGoalField(1, m.nome, m.sala));
-    (j.marcadoresT2 || []).forEach(m => addGoalField(2, m.nome, m.sala));
+    (j.marcadoresT1 || []).forEach(m => addGoalField(1, m.nome, m.sala, m.qtd||1));
+    (j.marcadoresT2 || []).forEach(m => addGoalField(2, m.nome, m.sala, m.qtd||1));
 }
 
-function addGoalField(time, nome='', sala='') {
+function addGoalField(time, nome='', sala='', qtd=1) {
     const div = document.createElement('div');
-    div.className = 'flex gap-2 mb-2 goal-entry';
+    div.className = 'flex gap-1 mb-2 goal-entry items-center';
     const opts = SALAS.map(s => `<option value="${s}" ${s === sala ? 'selected' : ''}>${s}</option>`).join('');
     div.innerHTML = `
-        <input type="text" value="${nome}" placeholder="Nome" class="w-2/3 bg-slate-800 p-2 rounded text-xs text-white border border-white/10">
-        <select class="w-1/4 bg-slate-800 p-2 rounded text-xs text-white border border-white/10">${opts}</select>
-        <button onclick="this.parentElement.remove()" class="text-red-400 px-1 font-bold">✕</button>
+        <input type="text" value="${nome}" placeholder="Nome" class="goal-nome flex-1 min-w-0 bg-slate-800 p-2 rounded text-xs text-white border border-white/10">
+        <select class="goal-sala bg-slate-800 p-2 rounded text-xs text-white border border-white/10" style="width:68px">${opts}</select>
+        <input type="number" value="${qtd}" min="1" max="20" title="Gols" class="goal-qtd bg-yellow-900/60 border border-yellow-500/40 p-2 rounded text-xs text-yellow-300 font-black text-center" style="width:42px">
+        <button onclick="this.parentElement.remove()" class="text-red-400 px-1 font-bold text-sm shrink-0">✕</button>
     `;
     document.getElementById(`lista-gols-t${time}`).appendChild(div);
 }
@@ -692,8 +693,9 @@ async function saveMatch() {
     if (isNaN(g1) || isNaN(g2)) { showFeedback('save-feedback', '⚠️ Insira o placar!', 'text-yellow-400'); return; }
 
     const getGoals = (time) => [...document.querySelectorAll(`#lista-gols-t${time} .goal-entry`)].map(d => ({
-        nome: d.querySelector('input').value.trim(),
-        sala: d.querySelector('select').value
+        nome: d.querySelector('.goal-nome').value.trim(),
+        sala: d.querySelector('.goal-sala').value,
+        qtd:  parseInt(d.querySelector('.goal-qtd').value) || 1
     })).filter(m => m.nome);
 
     j.g1 = g1; j.g2 = g2;
